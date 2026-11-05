@@ -227,17 +227,20 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
 .hero__lede { margin-top: 26px; max-width: 31em; font-size: clamp(17px, 1.4vw, 20px); line-height: 1.55; color: var(--ink-2); }
 .hero__actions { margin-top: 36px; display: flex; flex-wrap: wrap; align-items: center; gap: 18px 28px; }
 .more { font-weight: 500; font-size: 17px; white-space: nowrap; }
-.more::after { content: " \203A"; }
+.more::after { content: "\00A0\203A"; } /* the chevron stays with the last word */
 
 /* Before launch: a quiet status pill, not a link. At launch: .get, a plain text button (never a
    copy of Apple's badge; the official badge, if wanted, comes from Apple's marketing resources). */
+/* The pre-launch line is a planned leg on the map: a dashed route hairline that ends at a waypoint
+   ring, not yet walked. */
 .soon {
-  display: inline-flex; align-items: center; gap: 11px; height: 48px; padding: 0 20px 0 17px; border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, .16); background: rgba(255, 255, 255, .035);
+  display: inline-flex; align-items: center; gap: 13px; min-height: 48px;
   color: var(--ink); font-size: 15.5px; font-weight: 600; letter-spacing: -.005em; white-space: nowrap;
 }
-.soon__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--blue);
-             box-shadow: 0 0 0 4px rgba(64, 156, 255, .16), 0 0 14px rgba(64, 156, 255, .7); }
+.soon__dot { position: relative; flex: none; width: 38px; height: 12px;
+             background: repeating-linear-gradient(90deg, var(--blue) 0 6px, transparent 6px 10px) left center / 26px 2px no-repeat; }
+.soon__dot::after { content: ""; position: absolute; right: 0; top: 0; width: 12px; height: 12px; box-sizing: border-box;
+                    border-radius: 50%; border: 2px solid var(--blue); box-shadow: 0 0 10px rgba(64, 156, 255, .55); }
 .get {
   display: inline-flex; align-items: center; height: 50px; padding: 0 24px; border-radius: 999px;
   background: var(--blue-fill); color: #fff; font-size: 16px; font-weight: 600; letter-spacing: -.005em;
@@ -323,11 +326,17 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
 .duo { --pw: clamp(232px, 23vw, 304px); --ww: calc(var(--pw) * .6); padding-bottom: 8px; }
 .duo .phone { --w: var(--pw); }
 .duo .watch { --w: var(--ww); position: absolute; bottom: 4%; left: calc(50% + var(--pw) * .5 - var(--ww) * .55); }
-.duo--left .watch { left: calc(50% - var(--pw) * .5 - var(--ww) * .45); }
+/* Each watch sits over whole parts of the screen behind it, never across a line of text.
+   Trail Run: over the dashboard's third column of metrics below its first row, and the end of Pause. */
+.duo--run .watch { bottom: calc(4% + var(--pw) * .094); left: calc(50% + var(--pw) * .5 - var(--ww) * .68); }
+/* Race Day: under the list of stops, over the Position card that scrolls under the Pause bar. */
+.duo--aid { padding-bottom: calc(var(--pw) * .3); }
+.duo--aid .watch { top: calc(var(--pw) * 1.68); bottom: auto; left: calc(50% + var(--pw) * .5 - var(--ww) * .66); }
 @media (max-width: 900px) {
   .duo { --pw: min(60vw, 280px); }
   .duo .watch { left: calc(50% + var(--pw) * .5 - var(--ww) * .72); }
-  .duo--left .watch { left: calc(50% - var(--pw) * .5 - var(--ww) * .28); }
+  .duo--run .watch { left: calc(50% + var(--pw) * .5 - var(--ww) * .66); }
+  .duo--aid .watch { left: calc(50% + var(--pw) * .5 - var(--ww) * .64); }
 }
 
 /* two phones side by side, the second a step lower */
@@ -459,7 +468,7 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
 .privacy h2 span:nth-child(2) { color: #D3D6DC; }
 .privacy h2 span:nth-child(3) { color: var(--ink-2); }
 .privacy .lede { max-width: 36em; }
-.privacy .more { display: inline-block; margin-top: 28px; }
+.privacy .more { display: inline-block; margin-top: 28px; white-space: normal; text-wrap: balance; }
 
 /* ---- Ridgeway Plus ------------------------------------------------------------------------ */
 .plus-cards { list-style: none; margin: clamp(48px, 6vw, 72px) 0 0; padding: 0;
@@ -470,6 +479,7 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
 .plus-cards .peek img { width: 100%; height: auto; }
 .plus-cards .peek::after { content: ""; position: absolute; inset: 0;
                            background: linear-gradient(180deg, rgba(16, 20, 27, .9), transparent 18px, transparent 35%, #10141B 100%); }
+.plus-cards + .attrib { margin-top: 16px; text-align: center; }
 .plus-cards h3 { font-size: 20px; letter-spacing: -.015em; }
 .plus-cards p { margin-top: 8px; font-size: 15.5px; color: var(--ink-2); }
 .free { margin-top: clamp(40px, 5vw, 56px); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 16px 40px;
@@ -629,7 +639,7 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
         <li><h3>Pace and GAP</h3><p>Pace and grade-adjusted pace, automatic kilometre or mile splits, and manual laps kept separately.</p></li>
         <li><h3>Fuel timers</h3><p>Up to three reminders, by time or distance, each with its own pattern of taps on your wrist.</p></li>
       </ul>
-      <div class="stage duo">
+      <div class="stage duo duo--run">
         <figure class="phone">
           <div class="phone__body"><div class="phone__glass"><div class="phone__screen">
             <img src="assets/shots/trail-run.jpg" width="720" height="1564" loading="lazy" decoding="async"
@@ -638,8 +648,8 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
         </figure>
         <figure class="watch">
           <div class="watch__case"><div class="watch__glass"><div class="watch__screen">
-            <img src="assets/watch/run.png" width="400" height="487" loading="lazy" decoding="async"
-                 alt="The run page on Apple Watch: 1:23:45, 12.48 km, 5:42 per km, 152 bpm in zone 4, a Lap button, and Finish at 34% battery.">
+            <img src="assets/watch/run.jpg" width="400" height="487" loading="lazy" decoding="async"
+                 alt="The run page on Apple Watch at the same moment: 10:59, 1.29 km, 8:56 per km, 138 bpm in zone 3, a Lap button, and Finish at 34% battery.">
           </div></div></div>
         </figure>
       </div>
@@ -658,7 +668,7 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
       <h2 id="race-day-title">Every aid station. Every cutoff.</h2>
       <p class="lede">Mark the aid stations and cutoffs on your route, or paste them in from the race notes. On the day, Ridgeway shows the distance, climb and arrival time to the next one, and how much time you have in hand.</p>
     </div>
-    <div class="split__stage stage duo duo--left reveal d1">
+    <div class="split__stage stage duo duo--aid reveal d1">
       <figure class="phone">
         <div class="phone__body"><div class="phone__glass"><div class="phone__screen">
           <img src="assets/shots/race-day.jpg" width="720" height="1564" loading="lazy" decoding="async"
@@ -667,8 +677,8 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
       </figure>
       <figure class="watch">
         <div class="watch__case"><div class="watch__glass"><div class="watch__screen">
-          <img src="assets/watch/next-aid.png" width="400" height="487" loading="lazy" decoding="async"
-               alt="The Next Aid page on Apple Watch: Aid 2 of 4, 4.2 km and ↑ 310 m away, 38 minutes ahead of its cutoff.">
+          <img src="assets/watch/next-aid.jpg" width="400" height="487" loading="lazy" decoding="async"
+               alt="The Next Aid page on Apple Watch at the same moment: Hole-in-the-Wall, stop 1 of 3, 2.9 km and ↑ 520 m away, arriving at 10:17 with 8 minutes in hand before its 10:25 cutoff.">
         </div></div></div>
       </figure>
     </div>
@@ -707,7 +717,7 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
         <figure class="tile__fig">
           <div class="watch">
             <div class="watch__case"><div class="watch__glass"><div class="watch__screen">
-              <img src="assets/watch/off-route.png" width="400" height="487" loading="lazy" decoding="async"
+              <img src="assets/watch/off-route.jpg" width="400" height="487" loading="lazy" decoding="async"
                    alt="Off Route on Apple Watch: an arrow pointing back to the route, 50 m, Proceed to Route.">
             </div></div></div>
           </div>
@@ -719,7 +729,7 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
         <figure class="tile__fig">
           <div class="watch">
             <div class="watch__case"><div class="watch__glass"><div class="watch__screen">
-              <img src="assets/watch/route-compass.png" width="400" height="487" loading="lazy" decoding="async"
+              <img src="assets/watch/route-compass.jpg" width="400" height="487" loading="lazy" decoding="async"
                    alt="The route compass on Apple Watch: 18 m right of route, turn left in 120 m towards Red Tarn, 6.2 km and ↑ 480 m left.">
             </div></div></div>
           </div>
@@ -860,28 +870,28 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
       </li>
       <li class="reveal d1">
         <div class="watch"><div class="watch__case"><div class="watch__glass"><div class="watch__screen">
-          <img src="assets/watch/run.png" width="400" height="487" decoding="async"
+          <img src="assets/watch/run.jpg" width="400" height="487" decoding="async"
                alt="The run page: time, distance, pace, heart rate, a Lap button and the battery forecast.">
         </div></div></div></div>
         <h3>Run</h3><p>Time, pace and heart rate, and the battery you’ll finish with.</p>
       </li>
       <li class="reveal d2">
         <div class="watch"><div class="watch__case"><div class="watch__glass"><div class="watch__screen">
-          <img src="assets/watch/next-aid.png" width="400" height="487" decoding="async"
+          <img src="assets/watch/next-aid.jpg" width="400" height="487" decoding="async"
                alt="The Next Aid page: distance, climb, arrival time and the margin before the cutoff.">
         </div></div></div></div>
         <h3>Next Aid <span class="plus"><span class="vh">Part of Ridgeway </span>Plus</span></h3><p>The next aid station, and your time in hand.</p>
       </li>
       <li class="reveal d3">
         <div class="watch"><div class="watch__case"><div class="watch__glass"><div class="watch__screen">
-          <img src="assets/watch/route-compass.png" width="400" height="487" decoding="async"
+          <img src="assets/watch/route-compass.jpg" width="400" height="487" decoding="async"
                alt="The route compass: distance from the route and the next turn.">
         </div></div></div></div>
         <h3>Route Compass</h3><p>Where the line is, and where it goes next.</p>
       </li>
       <li class="reveal d3">
         <div class="watch"><div class="watch__case"><div class="watch__glass"><div class="watch__screen">
-          <img src="assets/watch/off-route.png" width="400" height="487" decoding="async"
+          <img src="assets/watch/off-route.jpg" width="400" height="487" decoding="async"
                alt="Off Route: the distance and direction back to the route.">
         </div></div></div></div>
         <h3>Off Route</h3><p>The distance and the direction back, in one glance.</p>
@@ -1004,6 +1014,7 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
         <p>Aid stations and cutoffs, arrival times and margins, and the Next Aid page on your wrist.</p>
       </li>
     </ul>
+    <p class="attrib">Map data © OpenStreetMap contributors · © OpenMapTiles · OpenFreeMap</p>
     <div class="free reveal">
       <h3>Always free</h3>
       <ul>

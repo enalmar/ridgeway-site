@@ -26,10 +26,11 @@ Store Connect, and the contact in the map-tile User-Agent), so those two address
 
 **The App Store link.** The site goes live before the listing exists (App Store Connect needs the
 privacy and support addresses), so nothing on it pretends to download. The hero and the closing
-section show a plain "Coming to the App Store" pill that is not a link, and the bar has no download
+section show a plain "Coming to the App Store" line, drawn as a planned leg of a route (a dashed
+hairline ending at a waypoint ring), that is not a link, and the bar has no download
 button. The live markup is already in `index.html`, in three comments marked `STAGED`: the bar's
 Download, and a "Download on the App Store" text button in the hero and in the closing section. At
-launch, delete the two pills, remove those comments' markers, replace `APPLE_ID` with the numeric
+launch, delete the two "Coming to the App Store" lines, remove those comments' markers, replace `APPLE_ID` with the numeric
 Apple ID from App Store Connect, and add `downloadUrl` to the JSON-LD in the head (marked the same
 way). The button is plain text; never a home-made copy of Apple's badge. If the official badge is
 wanted, it comes from Apple's marketing resources, with their rules (BRAND §3.4).
@@ -77,17 +78,26 @@ Light was added later from the same build and simulator, the same way).
 
 Things that are true of them, so nobody is surprised:
 
-- The Trail Run dashboard and the watch screens say "Demo": they come from the app's demo mode
-  and its screen gallery, which show the real session pages with sample data.
-- The watch clock reads 16:20–17:03. watchOS simulators cannot set the status bar, so the
-  Next Aid page's ETA 9:43 and cutoff 10:21 sit under a 17:03 clock.
+- The Trail Run dashboard and the watch map page come from the app's demo mode, which tags them
+  "Demo". `tools/shots.py` takes the tag out (`unmark_dashboard`, `unmark_watch_map`) and nothing
+  else: on the dashboard it is the title's subtitle on black, and on the watch it is a translucent
+  capsule, un-blended from the map, with the map under the letters filled in from around them.
+- The watch's Run and Next Aid pages are the Screen Gallery's pages (`watch.session.run.page`,
+  `watch.session.run.aid.warning`) with their sample values set to the moment of the iPhone
+  captures beside them, so the two devices agree: 10:59, 1.29 km, 8:56 /km and 138 bpm on the
+  run; Hole-in-the-Wall, stop 1 of 3, 2.9 km and ↑ 520 m away, ETA 10:17, cutoff 10:25, +8 min
+  on Race Day. They were taken in November 2026 from a scratch copy of `5661f21` with only those
+  values changed (`Packages/TrailUI/Sources/WatchSession/WatchRunGallery.swift`, `RunSamples`),
+  on "Site Apple Watch Ultra 3 (49mm)" booted with `SIMCTL_CHILD_TZ=Pacific/Honolulu` and shot at
+  09:41 there, so the clock matches the iPhone's 9:41.
+- The other watch pages read 16:20–17:03: watchOS simulators cannot set the status bar.
 - The You tab's numbers are sample Health history (the page says so), and its full-screen world
   map is Apple Maps, with Apple's credit in the capture.
 - There is no Lock Screen capture: the simulator would not lock, and a faked notification would
   not be the app's alert. It needs a real device.
 
 The raw files live outside this repository, in `~/Dev/ridgeway-site-assets-raw/` (`all-phone/` at
-1320 × 2868, `site/` for the watch at 400 × 487). To make the site's copies:
+1320 × 2868, `site/` for the watch at 400 × 487, or 422 × 514 for the Run and Next Aid pages). To make the site's copies:
 
 ```bash
 pip3 install pillow           # once
@@ -99,7 +109,7 @@ climbs, the download card, and the Hiking Pro detail around Helvellyn that sits 
 its thumbnail, so the style's 10 m contours and crags show at full size), scales iPhone captures to 720 px wide (480 for the map-style thumbnails) and writes
 progressive JPEG with optimised tables, quality 84. That is about 40% smaller than the
 `sips -s format jpeg` route the other sites use, with no difference visible on the map text at
-2x. Watch captures stay PNG, apart from the map page.
+2x. Watch captures are JPEG too (quality 82, 86 for the map page), scaled to 400 × 487.
 
 JPEG, not AVIF, for the reason in `trackload-site`: `sips` writes a tiled AVIF with an HDR
 property that Firefox's parser rejects, and because Firefox does support AVIF a `<picture>` never
