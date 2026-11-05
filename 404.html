@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Not found · Ridgeway</title>
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#07090D">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<!-- Self-contained. GitHub Pages serves this file for any missing path at any depth, so links and
+     assets are root-relative: right on ridgeway.enalmar.uk, where the site is the whole domain. -->
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html { background: #07090D; color: #F2F2EE; -webkit-text-size-adjust: 100%; }
+  body { margin: 0; min-height: 100vh; min-height: 100svh; display: grid; place-items: center; padding: 32px 20px;
+         font: 17px/1.55 -apple-system, BlinkMacSystemFont, "Inter", "Helvetica Neue", "Segoe UI", Roboto, sans-serif;
+         -webkit-font-smoothing: antialiased; text-align: center; overflow-x: clip; }
+  .lines { position: fixed; inset: 0; z-index: -1; pointer-events: none;
+           background: radial-gradient(42% 42% at 50% 46%, rgba(64, 156, 255, .32), transparent 75%), rgba(170, 190, 220, .13);
+           -webkit-mask: url(/assets/contours.svg) center / cover no-repeat; mask: url(/assets/contours.svg) center / cover no-repeat; }
+  @media (max-aspect-ratio: 4/5) {
+    .lines { -webkit-mask-image: url(/assets/contours-mobile.svg); mask-image: url(/assets/contours-mobile.svg); }
+  }
+  .box { max-width: 30em; }
+  .tag { display: inline-flex; align-items: center; gap: 10px; margin: 0; padding: 6px 14px 6px 10px; border-radius: 999px;
+         background: rgba(255, 69, 58, .14); color: #FF6961; font-size: 15px; font-weight: 600; }
+  .tag svg { width: 18px; height: 18px; }
+  h1 { margin: 22px 0 0; font-size: clamp(34px, 6vw, 56px); line-height: 1.05; letter-spacing: -.034em; font-weight: 700; text-wrap: balance; }
+  p { margin: 16px 0 0; color: #B3B8C2; text-wrap: pretty; }
+  nav { margin-top: 32px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+  nav span { display: flex; gap: 24px; }
+  a { color: #409CFF; text-decoration: none; font-weight: 500; }
+  a:hover { text-decoration: underline; text-underline-offset: .2em; }
+  a.home { padding: 11px 20px; border-radius: 999px; background: #1E6AE8; color: #fff; font-weight: 600; }
+  a.home:hover { text-decoration: none; background: #2A76F0; }
+  :focus-visible { outline: 2px solid #7CBCFF; outline-offset: 3px; border-radius: 999px; }
+</style>
+</head>
+<body>
+<div class="lines" aria-hidden="true"></div>
+<main class="box">
+  <p class="tag"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 19 6 6m0 0v9m0-9h9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Off Route · 404</p>
+  <h1>This page isn’t on the map.</h1>
+  <p>The address may be mistyped, or the page may have moved. The rest of Ridgeway is where you left it.</p>
+  <nav aria-label="Pages">
+    <a class="home" href="/">Proceed to Ridgeway</a>
+    <span><a href="/privacy/">Privacy</a><a href="/support/">Support</a></span>
+  </nav>
+</main>
+</body>
+</html>

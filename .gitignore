@@ -1,0 +1,9 @@
+.DS_Store
+._*
+Thumbs.db
+.env
+.env.*
+
+# SMB leftovers from the NAS era
+.smbdelete*
+

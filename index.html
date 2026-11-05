@@ -1,0 +1,1050 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ridgeway: offline maps and navigation for trail runs and hikes</title>
+<meta name="description" content="Offline topo maps and navigation for trail runners and hikers, on iPhone and Apple Watch. Splits, fuel timers, climbs, Off Route and turn alerts, Race Day cutoffs and the way back, with no signal and no account.">
+<link rel="canonical" href="https://ridgeway.enalmar.uk/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Ridgeway">
+<meta property="og:locale" content="en_GB">
+<meta property="og:url" content="https://ridgeway.enalmar.uk/">
+<meta property="og:title" content="Ridgeway: trail runs and mountain days, navigated offline">
+<meta property="og:description" content="Offline topo maps and navigation for trail runners and hikers, on iPhone and Apple Watch. No account, and no signal needed.">
+<meta property="og:image" content="https://ridgeway.enalmar.uk/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The Ridgeway icon and name beside a glowing route drawn over contour lines.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Ridgeway: trail runs and mountain days, navigated offline">
+<meta name="twitter:description" content="Offline topo maps and navigation for trail runners and hikers, on iPhone and Apple Watch.">
+<meta name="twitter:image" content="https://ridgeway.enalmar.uk/assets/og.jpg">
+<meta name="twitter:image:alt" content="The Ridgeway icon and name beside a glowing route drawn over contour lines.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#07090D">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<!-- TODO(App Store): add "downloadUrl":"https://apps.apple.com/app/id<APPLE_ID>" once the listing is live. -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication",
+ "name":"Ridgeway","alternateName":"Ridgeway: Hike & Trail Run",
+ "operatingSystem":"iOS 26.0 or later; watchOS 26.0 or later",
+ "applicationCategory":"TravelApplication","applicationSubCategory":"Navigation",
+ "description":"Offline topo maps and navigation for trail runners and hikers, on iPhone and Apple Watch.",
+ "url":"https://ridgeway.enalmar.uk/","image":"https://ridgeway.enalmar.uk/assets/icon-256.png"}
+</script>
+<style>
+/* ---- Ridgeway, the website ----------------------------------------------------------------
+   Its own look, not the other app sites': a night survey. Real Helvellyn contours sit fixed
+   behind everything, a faint Ridgeway Blue light where the hero is, and the app's own route
+   line drawing itself on load. Everything else is the app, in real captures, in CSS devices.
+   Colours are BRAND.md's: Night ground, Paper ink, Ridgeway Blue #409CFF (dark) as the one
+   accent, the route's magenta only where the app uses it. Never a blue field (BRAND §4.4). */
+:root {
+  color-scheme: dark;
+  --ground: #07090D;
+  --ink: #F2F2EE;
+  --ink-2: #B3B8C2;
+  --ink-3: #8C929D;
+  --hair: rgba(170, 190, 220, .13);
+  --hair-2: rgba(170, 190, 220, .22);
+  --tile: linear-gradient(180deg, rgba(22, 27, 37, .80), rgba(11, 14, 20, .80));
+  --blue: #409CFF;
+  --blue-hi: #7CBCFF;
+  --blue-fill: #1E6AE8;
+  --magenta: #FF4FB2;
+  --green: #30D158;
+
+  --sans: -apple-system, BlinkMacSystemFont, "Inter", "Helvetica Neue", "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --ease: cubic-bezier(.2, .7, .2, 1);
+
+  --gutter: clamp(18px, 5vw, 56px);
+  --measure: 1240px;
+  --bar: 64px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html {
+  background: var(--ground);
+  color: var(--ink);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--bar) + 8px);
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0;
+  font: 17px/1.5 var(--sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+}
+img { display: block; max-width: 100%; height: auto; }
+h1, h2, h3 { margin: 0; font-weight: 650; text-wrap: balance; }
+p { margin: 0; text-wrap: pretty; }
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: .2em; text-decoration-thickness: 1px; }
+:focus-visible { outline: 2px solid var(--blue-hi); outline-offset: 3px; border-radius: 6px; }
+.wrap { width: min(100% - 2 * var(--gutter), var(--measure)); margin-inline: auto; }
+.vh { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.skip { position: absolute; left: 12px; top: -60px; z-index: 100; padding: 10px 16px; border-radius: 10px;
+        background: var(--ink); color: #000; font-weight: 600; }
+.skip:focus { top: 12px; }
+
+/* ---- Terrain --------------------------------------------------------------------------------
+   The contours are one SVG used as a mask over coloured layers, so the lines take any colour or
+   gradient: pale blue-grey everywhere, Ridgeway Blue near the hero. Fixed behind the page; where
+   scroll-driven animations exist they drift gently and the hero light fades as you leave it. */
+.terrain { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.terrain__glow, .terrain__lines, .terrain__lift { position: absolute; inset: -6vh 0; }
+.terrain__glow {
+  background:
+    radial-gradient(46% 52% at 71% 46%, rgba(64, 156, 255, .19), rgba(30, 106, 232, .06) 52%, transparent 74%),
+    linear-gradient(180deg, rgba(14, 21, 38, .55), transparent 70%);
+  opacity: var(--fade, 1);
+}
+.terrain__lines, .terrain__lift {
+  -webkit-mask: url(assets/contours.svg) center / cover no-repeat;
+          mask: url(assets/contours.svg) center / cover no-repeat;
+}
+.terrain__lines { background: rgba(170, 190, 220, .17); }
+.terrain__lift {
+  background: radial-gradient(34% 40% at 71% 46%, rgba(64, 156, 255, .85), rgba(64, 156, 255, .25) 50%, transparent 75%);
+  opacity: var(--fade, 1);
+}
+@media (max-aspect-ratio: 4/5) {
+  .terrain__lines, .terrain__lift {
+    -webkit-mask-image: url(assets/contours-mobile.svg);
+            mask-image: url(assets/contours-mobile.svg);
+  }
+  .terrain__glow { background:
+    radial-gradient(80% 42% at 50% 70%, rgba(64, 156, 255, .16), rgba(30, 106, 232, .05) 52%, transparent 76%),
+    linear-gradient(180deg, rgba(14, 21, 38, .55), transparent 60%); }
+  .terrain__lift { background: radial-gradient(70% 34% at 50% 70%, rgba(64, 156, 255, .8), rgba(64, 156, 255, .2) 52%, transparent 78%); }
+}
+@supports (animation-timeline: scroll()) {
+  .terrain__glow, .terrain__lift {
+    animation: fade-out linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 110vh;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .terrain__lines { animation: drift linear both; animation-timeline: scroll(root); }
+    .terrain__glow, .terrain__lift {
+      animation: fade-out linear both, drift linear both;
+      animation-timeline: scroll(root), scroll(root);
+      animation-range: 0 110vh, normal;
+    }
+  }
+}
+@keyframes drift { from { transform: translate3d(0, 4vh, 0); } to { transform: translate3d(0, -4vh, 0); } }
+@keyframes fade-out { to { opacity: 0; } }
+
+/* ---- Bar ---------------------------------------------------------------------------------- */
+.bar { position: sticky; top: 0; z-index: 40; height: var(--bar); }
+.bar::before {
+  content: ""; position: absolute; inset: 0;
+  background: rgba(7, 9, 13, .72);
+  -webkit-backdrop-filter: saturate(1.6) blur(20px);
+          backdrop-filter: saturate(1.6) blur(20px);
+  border-bottom: 1px solid var(--hair);
+  opacity: 0; transition: opacity .35s ease;
+}
+.bar.is-stuck::before { opacity: 1; }
+.bar__inner { position: relative; height: 100%; display: flex; align-items: center; gap: 28px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); font-weight: 600;
+         font-size: 18px; letter-spacing: -.01em; }
+.brand:hover { text-decoration: none; }
+.brand img { width: 30px; height: 30px; }
+.bar nav { display: flex; gap: 26px; margin-left: auto; font-size: 14px; }
+.bar nav a { color: var(--ink-2); }
+.bar nav a:hover { color: var(--ink); text-decoration: none; }
+.bar__get { margin-left: 2px; padding: 7px 15px; border-radius: 999px; background: var(--blue-fill); color: #fff;
+            font-size: 14px; font-weight: 600; }
+.bar__get:hover { text-decoration: none; background: #2a76f0; }
+@media (max-width: 920px) { .bar nav { display: none; } .bar__get { margin-left: auto; } }
+
+/* ---- Devices --------------------------------------------------------------------------------
+   Drawn in CSS around the captures; no device artwork. Sizes use container units, so a device
+   is set by its width alone (--w) and everything inside scales with it. */
+.phone, .watch { container-type: inline-size; width: var(--w); flex: none; margin: 0; }
+.phone__body {
+  position: relative; padding: .55cqw; border-radius: 15.9cqw;
+  background: linear-gradient(155deg, #6c727d 0%, #2b2f37 16%, #1a1d23 48%, #2c3038 84%, #5e646f 100%);
+  box-shadow: 0 0 0 .3cqw rgba(0, 0, 0, .7), 0 3cqw 7cqw -1cqw rgba(0, 0, 0, .5), 0 16cqw 30cqw -6cqw rgba(0, 0, 0, .9);
+}
+.phone__body::before, .phone__body::after {
+  content: ""; position: absolute; width: .7cqw; border-radius: .4cqw;
+}
+.phone__body::before { /* Action button, volume up, volume down */
+  left: -.62cqw; top: 36cqw; height: 47cqw;
+  background: linear-gradient(#30343b 0 15%, transparent 15% 29%, #30343b 29% 62%, transparent 62% 69%, #30343b 69% 100%);
+}
+.phone__body::after { /* side button, Camera Control */
+  right: -.62cqw; top: 50cqw; height: 66cqw;
+  background: linear-gradient(#30343b 0 34%, transparent 34% 66%, #30343b 66% 100%);
+}
+.phone__glass { padding: 2.75cqw; border-radius: 15.35cqw; background: #030304; box-shadow: inset 0 0 0 .3cqw #121317; }
+.phone__screen { position: relative; overflow: hidden; border-radius: 12.6cqw; aspect-ratio: 1320 / 2868; background: #000; }
+.phone__screen img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.phone__screen::after { /* Dynamic Island, at the captures' own position */
+  content: ""; position: absolute; left: 50%; top: 1.46%; width: 28.5%; height: 3.84%; transform: translateX(-50%);
+  border-radius: 999px; background: #000;
+}
+.watch__case {
+  position: relative; padding: 4.4cqw; border-radius: 25cqw;
+  background: linear-gradient(150deg, #9298a2 0%, #50555e 20%, #2b2e34 52%, #43474f 80%, #7d828c 100%);
+  box-shadow: 0 0 0 .4cqw rgba(0, 0, 0, .65), 0 4cqw 8cqw -2cqw rgba(0, 0, 0, .55), 0 16cqw 30cqw -8cqw rgba(0, 0, 0, .9);
+}
+.watch__case::before { /* Digital Crown in its guard */
+  content: ""; position: absolute; right: -5.4cqw; top: 23%; width: 6.4cqw; height: 22cqw; border-radius: 1.6cqw;
+  background: repeating-linear-gradient(#8a8f98 0 .8cqw, #4d5159 .8cqw 1.6cqw);
+  box-shadow: inset -.8cqw 0 1cqw rgba(0, 0, 0, .45), -1.6cqw 0 0 .2cqw #3d4148;
+}
+.watch__case::after { /* side button */
+  content: ""; position: absolute; right: -1.7cqw; top: 61%; width: 2cqw; height: 19cqw; border-radius: 1cqw;
+  background: linear-gradient(90deg, #3a3e45, #5b6069);
+}
+.watch__glass { padding: 6cqw 5.6cqw; border-radius: 20.5cqw; background: #020203; box-shadow: inset 0 0 0 .5cqw #121317; }
+.watch__screen { position: relative; overflow: hidden; border-radius: 13cqw; aspect-ratio: 400 / 487; background: #000; }
+.watch__screen img { width: 100%; height: 100%; }
+
+.attrib { font-size: 12px; line-height: 1.4; color: var(--ink-3); letter-spacing: .005em; }
+
+/* ---- Hero --------------------------------------------------------------------------------- */
+.hero { position: relative; padding-block: clamp(28px, 6vh, 72px) clamp(64px, 10vh, 120px); overflow-x: clip; }
+.hero__grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px);
+              align-items: center; min-height: min(calc(100svh - var(--bar) - 96px), 820px); }
+.hero__kicker { display: inline-flex; align-items: center; gap: 10px; color: var(--ink-2); font-size: 15px; font-weight: 500; }
+.hero__kicker b { color: var(--ink); font-weight: 600; }
+.hero h1 { margin-top: 22px; font-size: clamp(44px, 5.5vw, 80px); line-height: 1; letter-spacing: -.037em; font-weight: 700; }
+.hero h1 span { display: block; color: var(--ink-2); }
+.hero__lede { margin-top: 26px; max-width: 31em; font-size: clamp(17px, 1.4vw, 20px); line-height: 1.55; color: var(--ink-2); }
+.hero__actions { margin-top: 36px; display: flex; flex-wrap: wrap; align-items: center; gap: 18px 28px; }
+.more { font-weight: 500; font-size: 17px; white-space: nowrap; }
+.more::after { content: " \203A"; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 12px; height: 58px; padding: 0 22px 0 14px; border-radius: 15px;
+  background: #000; color: #fff; border: 1px solid rgba(255, 255, 255, .42);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .6), 0 12px 32px -12px rgba(64, 156, 255, .45);
+  transition: border-color .2s ease, transform .2s ease;
+}
+.badge:hover { text-decoration: none; border-color: rgba(255, 255, 255, .9); }
+.badge:active { transform: scale(.98); }
+.badge img { width: 34px; height: 34px; }
+.badge span { display: flex; flex-direction: column; line-height: 1.08; }
+.badge small { font-size: 11.5px; font-weight: 500; letter-spacing: .01em; }
+.badge strong { font-size: 22px; font-weight: 600; letter-spacing: -.015em; }
+
+.hero__stage { position: relative; display: grid; place-items: center; padding-block: 12px 40px;
+               --pw: clamp(220px, min(22.5vw, (100svh - 210px) * .47), 312px); --ww: calc(var(--pw) * .6); }
+.hero__route { position: absolute; left: -68%; top: 48%; width: 200%; translate: 0 -50%; z-index: 0;
+               -webkit-mask: linear-gradient(90deg, transparent 22%, #000 36%); mask: linear-gradient(90deg, transparent 22%, #000 36%);
+               --rw-dur: 3.4s; --rw-delay: .45s; --rw-glow: .55; --rw-ground: var(--ground); }
+.hero__route svg { width: 100%; height: auto; display: block; overflow: visible; }
+.hero__route .rw-line { stroke-width: 7; }
+.hero__route .rw-glow { stroke-width: 22; }
+.hero__route .rw-start { r: 14px; }
+.hero__route .rw-top { r: 8px; }
+.hero .phone { --w: var(--pw); position: relative; z-index: 2; }
+.hero .watch { --w: var(--ww); position: absolute; z-index: 3; bottom: 30px; left: calc(50% - var(--pw) * .5 - var(--ww) * .5); }
+.hero .attrib { position: absolute; z-index: 3; bottom: 0; left: 0; right: 0; text-align: center; }
+@media (max-width: 900px) {
+  .hero__grid { grid-template-columns: 1fr; min-height: 0; gap: 48px; }
+  .hero__stage { --pw: min(64vw, 290px); margin-inline: auto; width: 100%; }
+  .hero .watch { left: calc(50% - var(--pw) * .5 - var(--ww) * .32); }
+  .hero__route { left: 50%; width: 210%; translate: -50% -50%; -webkit-mask: none; mask: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero__copy > * { animation: rise .9s var(--ease) both; }
+  .hero__copy > :nth-child(2) { animation-delay: .06s; }
+  .hero__copy > :nth-child(3) { animation-delay: .14s; }
+  .hero__copy > :nth-child(4) { animation-delay: .22s; }
+  .hero .phone { animation: rise-far 1.2s .12s var(--ease) both; }
+  .hero .watch { animation: rise-far 1.2s .38s var(--ease) both; }
+}
+@keyframes rise { from { opacity: 0; transform: translateY(16px); } }
+@keyframes rise-far { from { opacity: 0; transform: translateY(44px); } }
+
+/* ---- Sections ----------------------------------------------------------------------------- */
+.section { position: relative; padding-block: clamp(64px, 7.5vw, 112px); overflow-x: clip; }
+.split { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-template-rows: auto auto;
+         column-gap: clamp(16px, 2.4vw, 32px); align-items: center; }
+.split__copy { grid-column: 1 / span 5; grid-row: 1; align-self: end; }
+.split > .specs { grid-column: 1 / span 5; grid-row: 2; align-self: start; }
+.split__stage { grid-column: 7 / span 6; grid-row: 1 / span 2; }
+.split--flip .split__copy, .split--flip > .specs { grid-column: 8 / span 5; }
+.split--flip .split__stage { grid-column: 1 / span 6; }
+@media (max-width: 900px) {
+  .split { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; }
+  .split__copy, .split > .specs, .split__stage, .split--flip .split__copy, .split--flip > .specs, .split--flip .split__stage {
+    grid-column: 1; grid-row: auto; }
+  .split__stage { margin-top: 56px; }
+  .split > .specs { margin-top: 64px; }
+}
+.eyebrow { display: flex; align-items: center; gap: 11px; margin-bottom: 20px; color: var(--blue); font-size: 15px; font-weight: 600; }
+.eyebrow::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--blue); flex: none;
+                   box-shadow: 0 0 0 3px rgba(64, 156, 255, .16), 0 0 14px 2px rgba(64, 156, 255, .5); }
+.plus { display: inline-block; padding: 0 7px; border-radius: 9px; background: #2C2C2E; color: #A8A8AE;
+        font-size: 11px; line-height: 18px; font-weight: 600; letter-spacing: .02em; }
+.section h2 { font-size: clamp(36px, 4.7vw, 66px); line-height: 1.03; letter-spacing: -.034em; font-weight: 700; }
+.lede { margin-top: 22px; max-width: 31em; font-size: clamp(17px, 1.35vw, 20px); line-height: 1.55; color: var(--ink-2); }
+.center { text-align: center; }
+.center .eyebrow { justify-content: center; }
+.center .lede { margin-inline: auto; }
+
+.specs { list-style: none; margin: 40px 0 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+.specs li { padding-top: 16px; border-top: 1px solid var(--hair-2); }
+.specs h3 { font-size: 16px; font-weight: 600; letter-spacing: -.005em; }
+.specs p { margin-top: 6px; font-size: 15px; line-height: 1.5; color: var(--ink-2); }
+@media (max-width: 520px) { .specs { grid-template-columns: 1fr; gap: 22px; } }
+
+/* A pool of light under each group of devices: the screen lighting the hill at night. */
+.stage { position: relative; display: flex; justify-content: center; align-items: flex-end; isolation: isolate; }
+.stage::before { content: ""; position: absolute; z-index: -1; left: 50%; top: 50%; width: 150%; aspect-ratio: 1.3;
+                 translate: -50% -50%; border-radius: 50%;
+                 background: radial-gradient(closest-side, rgba(64, 156, 255, .2), rgba(30, 106, 232, .07) 50%, transparent); }
+.stage .attrib { position: absolute; left: 0; right: 0; bottom: -34px; text-align: center; }
+
+/* phone with a watch in front of its lower corner */
+.duo { --pw: clamp(232px, 23vw, 304px); --ww: calc(var(--pw) * .6); padding-bottom: 8px; }
+.duo .phone { --w: var(--pw); }
+.duo .watch { --w: var(--ww); position: absolute; bottom: 4%; left: calc(50% + var(--pw) * .5 - var(--ww) * .55); }
+.duo--left .watch { left: calc(50% - var(--pw) * .5 - var(--ww) * .45); }
+@media (max-width: 900px) {
+  .duo { --pw: min(60vw, 280px); }
+  .duo .watch { left: calc(50% + var(--pw) * .5 - var(--ww) * .72); }
+  .duo--left .watch { left: calc(50% - var(--pw) * .5 - var(--ww) * .28); }
+}
+
+/* two phones side by side, the second a step lower */
+.pair { --pw: clamp(200px, 19vw, 268px); gap: clamp(14px, 2vw, 28px); align-items: flex-start; padding-bottom: 8px; }
+.pair .phone { --w: var(--pw); }
+.pair .phone:nth-child(2) { margin-top: calc(var(--pw) * .34); }
+@media (max-width: 900px) { .pair { --pw: min(42vw, 236px); } }
+
+/* one phone, with a card from another screen floating beside it */
+.solo { --pw: clamp(240px, 23vw, 304px); padding-bottom: 8px; }
+.solo .phone { --w: var(--pw); }
+.float { container-type: inline-size; position: absolute; z-index: 2; margin: 0; width: calc(var(--pw) * 1.12);
+         left: calc(50% - var(--pw) * .02); bottom: 22%; }
+.float img { width: 100%; border-radius: 6.2cqw;
+             box-shadow: 0 0 0 1px rgba(255, 255, 255, .1), 0 30px 60px -18px rgba(0, 0, 0, .95), 0 0 50px -10px rgba(64, 156, 255, .35); }
+@media (max-width: 900px) { .solo { --pw: min(60vw, 280px); } .float { width: min(var(--pw) * 1.12, 86%); left: auto; right: 0; } }
+
+/* Trail Run: the devices between their callouts, over the route's own elevation profile */
+.run { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center;
+       gap: clamp(28px, 4vw, 72px); margin-top: clamp(48px, 6vw, 80px); }
+.run .duo { --pw: clamp(240px, 23vw, 316px); width: calc(var(--pw) + var(--ww) * .95); }
+.run__notes { list-style: none; margin: 0; padding: 0; display: grid; gap: 44px; }
+.run__notes:first-of-type { text-align: right; }
+.run__notes li { max-width: 21em; }
+.run__notes:first-of-type li { margin-left: auto; }
+.run__notes h3 { font-size: 20px; letter-spacing: -.015em; }
+.run__notes p { margin-top: 8px; font-size: 15.5px; line-height: 1.5; color: var(--ink-2); }
+.run__profile { position: absolute; z-index: -1; left: 50%; width: 100vw; translate: -50% 0; bottom: -3%; height: 25%;
+                --rw-dur: 3.2s; --rw-delay: .35s; }
+.run__profile svg { width: 100%; height: 100%; display: block; }
+.run__profile .rw-pline { stroke-width: 2px; filter: drop-shadow(0 0 5px rgba(64, 156, 255, .65)); }
+.js-reveal .run:not(.in) .rw-preveal { animation-play-state: paused; }
+@media (max-width: 900px) {
+  .run { grid-template-columns: minmax(0, 1fr); row-gap: 40px; }
+  .run .duo { --pw: min(60vw, 280px); width: auto; }
+  .run .stage { grid-row: 1; }
+  .run__notes, .run__notes:first-of-type { text-align: left; gap: 26px; }
+  .run__notes li, .run__notes:first-of-type li { margin-left: 0; max-width: none; padding-top: 16px; border-top: 1px solid var(--hair-2); }
+  .run__notes h3 { font-size: 17px; }
+  .run__profile { bottom: auto; top: 18%; height: 30%; }
+}
+
+/* ---- Navigation: tiles -------------------------------------------------------------------- */
+.tiles { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: clamp(12px, 1.4vw, 20px); margin-top: clamp(48px, 6vw, 80px); }
+.tile { position: relative; overflow: hidden; border-radius: 28px; background: var(--tile); border: 1px solid var(--hair);
+        padding: 30px 30px 0; display: flex; flex-direction: column; isolation: isolate; }
+.tile h3 { font-size: 22px; line-height: 1.2; letter-spacing: -.02em; }
+.tile p { margin-top: 8px; max-width: 30em; font-size: 15.5px; line-height: 1.5; color: var(--ink-2); }
+.tile__fig { margin: auto 0 0; padding-top: 28px; display: flex; justify-content: center; }
+.tile--off { grid-column: span 7; grid-row: span 2; }
+.tile--off .phone { --w: clamp(250px, 27vw, 372px); margin-bottom: calc(var(--w) * -.5); }
+.tile--off::before { content: ""; position: absolute; z-index: -1; left: 50%; bottom: -10%; width: 90%; aspect-ratio: 1;
+                     translate: -50% 0; border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 69, 58, .13), transparent); }
+.tile--wrist, .tile--compass { grid-column: span 5; }
+.tile--wrist .tile__fig, .tile--compass .tile__fig { padding-bottom: 30px; }
+.tile .watch { --w: clamp(150px, 13vw, 184px); }
+.tile--turn, .tile--climbs, .tile--back { grid-column: span 4; }
+.tile--turn .phone { --w: clamp(230px, 22vw, 290px); margin-bottom: -18px; }
+.tile--turn .phone__screen { aspect-ratio: 1320 / 1280; }
+.tile--climbs .tile__fig { padding-bottom: 30px; }
+.shot { overflow: hidden; border-radius: 18px; box-shadow: 0 0 0 1px rgba(255, 255, 255, .08), 0 24px 50px -20px rgba(0, 0, 0, .9); }
+.tile--back { justify-content: space-between; padding-bottom: 30px; }
+.tile--back svg { width: 100%; max-width: 300px; height: auto; margin: 26px auto 0; overflow: visible; }
+.tiles + .attrib { margin-top: 16px; text-align: center; }
+@media (max-width: 1000px) {
+  .tile--off { grid-column: span 12; grid-row: auto; }
+  .tile--wrist, .tile--compass { grid-column: span 6; }
+  .tile--turn, .tile--climbs { grid-column: span 6; }
+  .tile--back { grid-column: span 12; }
+}
+@media (max-width: 640px) {
+  .tile { padding: 24px 22px 0; border-radius: 24px; }
+  .tile--wrist, .tile--compass, .tile--turn, .tile--climbs { grid-column: span 12; }
+  .tile--off .phone { --w: min(68vw, 290px); }
+}
+
+/* ---- Apple Watch: the row of pages -------------------------------------------------------- */
+.watches { list-style: none; margin: clamp(56px, 7vw, 88px) 0 0; padding: 0;
+           display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(20px, 3vw, 44px); }
+.watches li { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.watches .watch { --w: min(100%, 200px); }
+.watches h3 { margin-top: 26px; font-size: 16px; font-weight: 600; }
+.watches p { margin-top: 4px; font-size: 14px; line-height: 1.45; color: var(--ink-2); max-width: 15em; }
+.watches + .attrib { margin-top: 28px; text-align: center; }
+@media (max-width: 900px) {
+  .watches { display: flex; gap: 22px; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
+             margin-inline: calc(-1 * var(--gutter)); padding: 8px var(--gutter) 12px; scrollbar-width: none; }
+  .watches::-webkit-scrollbar { display: none; }
+  .watches li { flex: 0 0 min(56vw, 230px); scroll-snap-align: center; }
+}
+
+/* ---- Map styles --------------------------------------------------------------------------- */
+.styles { list-style: none; margin: clamp(56px, 7vw, 88px) 0 0; padding: 0;
+          display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(18px, 3vw, 44px); }
+.styles li { display: flex; flex-direction: column; align-items: center; }
+.styles .phone { --w: min(100%, 262px); }
+.styles h3 { margin-top: 22px; display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 600; }
+.styles + .attrib { margin-top: 28px; text-align: center; }
+@media (max-width: 760px) { .styles { grid-template-columns: 1fr 1fr; row-gap: 44px; } }
+
+/* ---- Privacy ------------------------------------------------------------------------------ */
+.privacy h2 { font-size: clamp(42px, 7.6vw, 112px); line-height: .98; letter-spacing: -.042em; }
+.privacy h2 span { display: block; }
+.privacy h2 span:nth-child(2) { color: #D3D6DC; }
+.privacy h2 span:nth-child(3) { color: var(--ink-2); }
+.privacy .lede { max-width: 36em; }
+.privacy .more { display: inline-block; margin-top: 28px; }
+
+/* ---- Ridgeway Plus ------------------------------------------------------------------------ */
+.plus-cards { list-style: none; margin: clamp(48px, 6vw, 72px) 0 0; padding: 0;
+              display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(12px, 1.4vw, 20px); }
+.plus-cards li { position: relative; overflow: hidden; border-radius: 26px; background: var(--tile); border: 1px solid var(--hair);
+                 padding: 0 28px 30px; }
+.plus-cards .peek { height: 190px; margin: 0 -28px 26px; overflow: hidden; position: relative; }
+.plus-cards .peek img { width: 100%; height: auto; }
+.plus-cards .peek::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 35%, #10141B 100%); }
+.plus-cards h3 { font-size: 20px; letter-spacing: -.015em; }
+.plus-cards p { margin-top: 8px; font-size: 15.5px; color: var(--ink-2); }
+.free { margin-top: clamp(40px, 5vw, 56px); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 16px 40px;
+        padding-top: 28px; border-top: 1px solid var(--hair-2); }
+.free h3 { font-size: 20px; letter-spacing: -.015em; }
+.free ul { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: 40px; }
+.free li { break-inside: avoid; padding: 0 0 10px 26px; position: relative; color: var(--ink-2); }
+.free li::before { content: ""; position: absolute; left: 2px; top: .42em; width: 12px; height: 7px;
+                   border-left: 2px solid var(--blue); border-bottom: 2px solid var(--blue); rotate: -45deg; }
+.free p { grid-column: 2; color: var(--ink-3); font-size: 15px; }
+@media (max-width: 900px) {
+  .plus-cards { grid-template-columns: 1fr; }
+  .free { grid-template-columns: 1fr; }
+  .free p { grid-column: 1; }
+}
+@media (max-width: 520px) { .free ul { columns: 1; } }
+
+/* ---- Close -------------------------------------------------------------------------------- */
+.close { position: relative; padding-block: clamp(96px, 12vw, 160px) 0; text-align: center; overflow: clip; }
+.close__icon { width: 112px; height: 112px; margin: 0 auto 36px; border-radius: 25px;
+               box-shadow: 0 0 0 1px rgba(255, 255, 255, .08), 0 24px 60px -16px rgba(64, 156, 255, .45); }
+.close h2 { font-size: clamp(36px, 5.4vw, 76px); line-height: 1.03; letter-spacing: -.036em; font-weight: 700; }
+.close h2 span { display: block; color: var(--ink-2); }
+.close .badge { margin-top: 40px; }
+.close__fine { margin-top: 22px; font-size: 14px; color: var(--ink-3); }
+.ridge { position: relative; margin-top: clamp(64px, 9vw, 120px); height: clamp(120px, 16vw, 220px); --rw-dur: 3.6s; --rw-delay: .2s; }
+.ridge svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ridge .rw-pline { stroke-width: 2.5px; filter: drop-shadow(0 0 6px rgba(64, 156, 255, .7)); }
+.js-reveal .ridge:not(.in) .rw-preveal { animation-play-state: paused; }
+
+/* ---- Footer ------------------------------------------------------------------------------- */
+.foot { position: relative; padding: 40px 0 56px; border-top: 1px solid var(--hair); background: rgba(7, 9, 13, .86); font-size: 14px; color: var(--ink-3); }
+.foot__top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px 32px; }
+.foot nav { display: flex; flex-wrap: wrap; gap: 10px 28px; font-size: 15px; }
+.foot nav a { color: var(--ink-2); }
+.foot__fine { margin-top: 28px; display: grid; gap: 8px; max-width: 64em; }
+
+/* ---- Reveal on scroll ----------------------------------------------------------------------
+   Visible by default. The script opts in (adds .js-reveal) only when it can reveal again, and
+   gives up after a few seconds if anything in view is still hidden. */
+.js-reveal .reveal { opacity: 0; transform: translateY(32px); transition: opacity 1s var(--ease), transform 1s var(--ease); }
+.js-reveal .reveal.in { opacity: 1; transform: none; }
+.js-reveal .reveal.d1 { transition-delay: .08s; }
+.js-reveal .reveal.d2 { transition-delay: .16s; }
+.js-reveal .reveal.d3 { transition-delay: .24s; }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="terrain" aria-hidden="true">
+  <div class="terrain__glow"></div>
+  <div class="terrain__lines"></div>
+  <div class="terrain__lift"></div>
+</div>
+
+<header class="bar" id="bar">
+  <div class="wrap bar__inner">
+    <a class="brand" href="./"><img src="assets/favicon.svg" width="30" height="30" alt="">Ridgeway</a>
+    <nav aria-label="Sections">
+      <a href="#trail-run">Trail Run</a>
+      <a href="#navigation">Navigation</a>
+      <a href="#offline">Offline Maps</a>
+      <a href="#watch">Apple Watch</a>
+      <a href="#plus">Ridgeway Plus</a>
+    </nav>
+    <!-- TODO(App Store): point at the listing, as below. -->
+    <a class="bar__get" href="#app-store">Download</a>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap hero__grid">
+    <div class="hero__copy">
+      <p class="hero__kicker"><b>Ridgeway</b> for iPhone and Apple Watch</p>
+      <h1 id="hero-title">Trail runs and mountain days, <span>navigated offline.</span></h1>
+      <p class="hero__lede">Topo maps that live on your iPhone and Apple Watch, with turn alerts on your wrist, every climb counted and the way back, all without a signal. No account, and navigation is never locked.</p>
+      <div class="hero__actions">
+        <!-- TODO(App Store): replace href="#app-store" with https://apps.apple.com/app/id<APPLE_ID>
+             when the listing is live. Three links use it: here, the bar's Download and the closing section. -->
+        <a class="badge" href="#app-store"><img src="assets/favicon.svg" width="34" height="34" alt=""><span><small>Download on the</small> <strong>App Store</strong></span></a>
+        <a class="more" href="#offline">How offline maps work</a>
+      </div>
+    </div>
+    <div class="hero__stage">
+      <div class="hero__route" aria-hidden="true">
+<!-- route: art/route.svg from tools/art, with its local contours removed (the page has its own terrain). Illustrative. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2052 1316" fill="none" aria-hidden="true" focusable="false">
+<defs><filter id="rw-route-blur" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="12"/></filter></defs>
+<style>
+.rw-glow{stroke:var(--rw-route,#409CFF);stroke-width:16;stroke-linecap:round;stroke-linejoin:round;opacity:var(--rw-glow,.35)}
+.rw-line{stroke:var(--rw-route,#409CFF);stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+.rw-draw{stroke-dasharray:1;stroke-dashoffset:0}
+.rw-start{fill:var(--rw-start,#FF4FB2);stroke:var(--rw-ground,#07090E);stroke-width:4}
+.rw-top{fill:var(--rw-ink,#F2F2EE)}
+@media (prefers-reduced-motion:no-preference){
+.rw-draw{stroke-dashoffset:1;animation:rw-draw var(--rw-dur,3.2s) cubic-bezier(.45,.05,.2,1) var(--rw-delay,.5s) forwards}
+.rw-start{opacity:0;animation:rw-in .5s ease-out forwards}
+.rw-top{opacity:0;animation:rw-in .6s ease-out calc(var(--rw-delay,.5s) + 1.4s) forwards}
+}
+@keyframes rw-draw{to{stroke-dashoffset:0}}
+@keyframes rw-in{to{opacity:1}}
+</style>
+
+<path class="rw-glow rw-draw" filter="url(#rw-route-blur)" pathLength="1" d="M1834.3 383.7L1696.7 416.0 1630.8 425.4 1610.4 430.7 1595.8 437.9 1568.9 457.1 1558.1 462.9 1502.2 478.9 1422.8 517.1 1399.4 533.5 1326.4 596.7 1309.0 607.1 1293.3 611.4 1259.2 614.7 1242.9 617.7 1151.3 652.1 1131.2 656.8 1084.0 662.8 1067.9 667.6 1056.7 672.8 1039.4 684.4 1019.8 701.4 979.9 745.4 904.5 820.3 882.0 849.1 860.9 888.4 849.9 905.1 822.0 936.9 801.0 957.1 781.4 971.9 750.5 991.6 678.3 1028.8 604.7 1073.5 568.4 1092.8 544.9 1098.1 491.0 1096.7 450.3 1092.2 406.4 1083.4 361.9 1071.1 249.6 1033.2 240.1 1028.6 235.9 1024.9 230.2 1016.0 227.2 1006.5 227.5 991.4 231.8 981.3 235.5 977.0 286.2 935.6 327.8 899.3 388.6 856.6 399.0 851.5 409.6 850.1 420.4 852.5 495.7 891.9 566.6 925.2 580.1 927.5 591.1 922.1 595.7 916.6 653.8 819.2 689.3 774.8 696.2 755.4 703.3 716.4 713.8 694.4 751.6 637.5 810.1 554.9 976.9 345.6 996.2 327.5 1098.4 245.3 1110.0 237.0 1119.4 232.5 1134.3 228.2 1149.7 226.6 1195.5 234.3 1238.3 245.4 1284.0 263.4 1303.3 269.4 1354.6 278.6 1413.2 293.4 1834.3 383.7"/>
+<path class="rw-line rw-draw" pathLength="1" d="M1834.3 383.7L1696.7 416.0 1630.8 425.4 1610.4 430.7 1595.8 437.9 1568.9 457.1 1558.1 462.9 1502.2 478.9 1422.8 517.1 1399.4 533.5 1326.4 596.7 1309.0 607.1 1293.3 611.4 1259.2 614.7 1242.9 617.7 1151.3 652.1 1131.2 656.8 1084.0 662.8 1067.9 667.6 1056.7 672.8 1039.4 684.4 1019.8 701.4 979.9 745.4 904.5 820.3 882.0 849.1 860.9 888.4 849.9 905.1 822.0 936.9 801.0 957.1 781.4 971.9 750.5 991.6 678.3 1028.8 604.7 1073.5 568.4 1092.8 544.9 1098.1 491.0 1096.7 450.3 1092.2 406.4 1083.4 361.9 1071.1 249.6 1033.2 240.1 1028.6 235.9 1024.9 230.2 1016.0 227.2 1006.5 227.5 991.4 231.8 981.3 235.5 977.0 286.2 935.6 327.8 899.3 388.6 856.6 399.0 851.5 409.6 850.1 420.4 852.5 495.7 891.9 566.6 925.2 580.1 927.5 591.1 922.1 595.7 916.6 653.8 819.2 689.3 774.8 696.2 755.4 703.3 716.4 713.8 694.4 751.6 637.5 810.1 554.9 976.9 345.6 996.2 327.5 1098.4 245.3 1110.0 237.0 1119.4 232.5 1134.3 228.2 1149.7 226.6 1195.5 234.3 1238.3 245.4 1284.0 263.4 1303.3 269.4 1354.6 278.6 1413.2 293.4 1834.3 383.7"/>
+<circle class="rw-top" cx="232.6" cy="1020.6" r="6"/>
+<circle class="rw-start" cx="1834.3" cy="383.7" r="11"/>
+</svg>
+      </div>
+      <figure class="phone">
+        <div class="phone__body"><div class="phone__glass"><div class="phone__screen">
+          <img src="assets/shots/map-standard-dark.jpg" width="720" height="1564" fetchpriority="high"
+               alt="Ridgeway’s map on iPhone, Standard Dark: the fells around Helvellyn, with the route Helvellyn via Striding Edge in magenta, 12.1 km, ↑ 816 m, 3 h 30 min.">
+        </div></div></div>
+      </figure>
+      <figure class="watch">
+        <div class="watch__case"><div class="watch__glass"><div class="watch__screen">
+          <img src="assets/watch/map.jpg" width="400" height="487"
+               alt="Ridgeway on Apple Watch Ultra following the route on a dark topo map, with a turn in 210 m.">
+        </div></div></div>
+      </figure>
+      <p class="attrib">Map data © OpenStreetMap contributors · © OpenMapTiles · OpenFreeMap</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="trail-run" aria-labelledby="trail-run-title">
+  <div class="wrap">
+    <div class="center reveal">
+      <p class="eyebrow">Trail Run</p>
+      <h2 id="trail-run-title">Navigation at running pace.</h2>
+      <p class="lede">Choose Trail Run at the start and Ridgeway retunes itself for running speed: turn alerts come early enough to act on, Off Route reacts in seconds, and climbs are found at a runner’s scale, descents included.</p>
+    </div>
+    <div class="run reveal">
+      <div class="run__profile" aria-hidden="true">
+<!-- profile, again: the illustrative route's elevation, drawn when this comes into view. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 240" preserveAspectRatio="none" fill="none" aria-hidden="true" focusable="false">
+<defs><linearGradient id="rw-pf2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#409CFF" stop-opacity=".22"/><stop offset="1" stop-color="#409CFF" stop-opacity="0"/></linearGradient>
+<clipPath id="rw-pc2"><rect class="rw-preveal" width="1200" height="240"/></clipPath></defs>
+<path class="rw-pbase" d="M0 239.5H1200"/>
+<path class="rw-pfill" clip-path="url(#rw-pc2)" d="M0.0 209.0L14.8 208.2 30.8 208.3 45.6 204.7 55.6 203.6 64.8 201.7 76.1 200.3 86.2 197.2 110.2 188.1 134.6 175.3 148.5 166.4 160.0 157.2 190.6 129.3 202.1 123.1 218.2 113.3 243.7 93.1 250.3 89.1 255.4 86.8 277.5 82.8 297.8 85.9 316.6 86.3 329.0 87.3 338.9 86.8 351.2 83.1 364.0 80.9 380.5 76.8 401.7 70.4 407.8 68.0 417.7 62.6 422.8 60.9 436.5 58.9 450.3 54.6 461.5 52.8 465.2 53.1 480.4 56.9 504.1 57.3 510.4 58.5 513.0 58.5 518.1 55.7 530.7 43.3 536.9 39.1 553.1 31.9 564.8 30.8 570.9 31.6 574.0 33.1 579.1 38.4 583.2 44.7 586.9 49.1 591.9 53.1 597.9 56.2 601.4 56.8 611.0 56.0 627.3 58.3 643.3 57.7 648.9 60.3 668.6 74.7 681.1 80.6 687.4 81.9 698.7 82.9 711.4 84.9 727.5 85.5 739.9 86.6 743.6 87.6 762.1 96.9 771.3 102.6 776.8 106.7 785.6 115.6 791.7 119.8 800.3 124.4 812.5 129.0 816.2 129.8 826.0 129.8 843.5 131.8 873.0 132.0 886.5 130.7 892.7 130.8 900.0 132.5 917.5 139.1 929.6 141.1 937.2 144.8 947.1 151.4 959.6 165.9 971.2 175.8 977.5 179.9 986.9 183.6 1000.8 187.3 1026.8 192.2 1050.1 195.1 1063.7 196.0 1083.3 200.3 1094.4 200.7 1107.9 199.9 1126.3 201.5 1155.8 205.2 1168.1 207.9 1184.0 209.8 1200.0 209.4L1200 240L0 240Z"/>
+<path class="rw-pline" clip-path="url(#rw-pc2)" d="M0.0 209.0L14.8 208.2 30.8 208.3 45.6 204.7 55.6 203.6 64.8 201.7 76.1 200.3 86.2 197.2 110.2 188.1 134.6 175.3 148.5 166.4 160.0 157.2 190.6 129.3 202.1 123.1 218.2 113.3 243.7 93.1 250.3 89.1 255.4 86.8 277.5 82.8 297.8 85.9 316.6 86.3 329.0 87.3 338.9 86.8 351.2 83.1 364.0 80.9 380.5 76.8 401.7 70.4 407.8 68.0 417.7 62.6 422.8 60.9 436.5 58.9 450.3 54.6 461.5 52.8 465.2 53.1 480.4 56.9 504.1 57.3 510.4 58.5 513.0 58.5 518.1 55.7 530.7 43.3 536.9 39.1 553.1 31.9 564.8 30.8 570.9 31.6 574.0 33.1 579.1 38.4 583.2 44.7 586.9 49.1 591.9 53.1 597.9 56.2 601.4 56.8 611.0 56.0 627.3 58.3 643.3 57.7 648.9 60.3 668.6 74.7 681.1 80.6 687.4 81.9 698.7 82.9 711.4 84.9 727.5 85.5 739.9 86.6 743.6 87.6 762.1 96.9 771.3 102.6 776.8 106.7 785.6 115.6 791.7 119.8 800.3 124.4 812.5 129.0 816.2 129.8 826.0 129.8 843.5 131.8 873.0 132.0 886.5 130.7 892.7 130.8 900.0 132.5 917.5 139.1 929.6 141.1 937.2 144.8 947.1 151.4 959.6 165.9 971.2 175.8 977.5 179.9 986.9 183.6 1000.8 187.3 1026.8 192.2 1050.1 195.1 1063.7 196.0 1083.3 200.3 1094.4 200.7 1107.9 199.9 1126.3 201.5 1155.8 205.2 1168.1 207.9 1184.0 209.8 1200.0 209.4"/>
+</svg>
+      </div>
+      <ul class="run__notes">
+        <li><h3>Pace and GAP</h3><p>Pace and grade-adjusted pace, automatic kilometre or mile splits, and manual laps kept separately.</p></li>
+        <li><h3>Fuel timers</h3><p>Up to three reminders, by time or distance, each with its own pattern of taps on your wrist.</p></li>
+      </ul>
+      <div class="stage duo">
+        <figure class="phone">
+          <div class="phone__body"><div class="phone__glass"><div class="phone__screen">
+            <img src="assets/shots/trail-run.jpg" width="720" height="1564" loading="lazy" decoding="async"
+                 alt="The Trail Run dashboard on iPhone: 10:59 elapsed, pace 8:56 per km, grade-adjusted pace 5:21, heart rate 138, 700 m of ascent left, a gel due in 34 min and a drink in 9 min, under the route’s elevation profile.">
+          </div></div></div>
+        </figure>
+        <figure class="watch">
+          <div class="watch__case"><div class="watch__glass"><div class="watch__screen">
+            <img src="assets/watch/run.png" width="400" height="487" loading="lazy" decoding="async"
+                 alt="The run page on Apple Watch: 1:23:45, 12.48 km, 5:42 per km, 152 bpm in zone 4, a Lap button, and Finish at 34% battery.">
+          </div></div></div>
+        </figure>
+      </div>
+      <ul class="run__notes">
+        <li><h3>Battery forecast</h3><p>The charge you’ll finish with, worked out from how fast the battery is falling.</p></li>
+        <li><h3>Action button</h3><p>On Apple Watch Ultra, press it to mark a lap, arrive at an aid station or log fuel.</p></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="race-day" aria-labelledby="race-day-title">
+  <div class="wrap split split--flip">
+    <div class="split__copy reveal">
+      <p class="eyebrow">Race Day <span class="plus"><span class="vh">Part of Ridgeway </span>Plus</span></p>
+      <h2 id="race-day-title">Every aid station. Every cutoff.</h2>
+      <p class="lede">Mark the aid stations and cutoffs on your route, or paste them in from the race notes. On the day, Ridgeway shows the distance, climb and arrival time to the next one, and how much time you have in hand.</p>
+    </div>
+    <div class="split__stage stage duo duo--left reveal d1">
+      <figure class="phone">
+        <div class="phone__body"><div class="phone__glass"><div class="phone__screen">
+          <img src="assets/shots/race-day.jpg" width="720" height="1564" loading="lazy" decoding="async"
+               alt="Race Day on iPhone: Hole-in-the-Wall is next, arriving 10:17 am with 8 minutes in hand before its cutoff; Helvellyn at 10:39 am with 26 minutes; Red Tarn at 10:48 am with 32 minutes.">
+        </div></div></div>
+      </figure>
+      <figure class="watch">
+        <div class="watch__case"><div class="watch__glass"><div class="watch__screen">
+          <img src="assets/watch/next-aid.png" width="400" height="487" loading="lazy" decoding="async"
+               alt="The Next Aid page on Apple Watch: Aid 2 of 4, 4.2 km and ↑ 310 m away, 38 minutes ahead of its cutoff.">
+        </div></div></div>
+      </figure>
+    </div>
+    <ul class="specs reveal">
+      <li><h3>Next Aid</h3><p>Distance, climb, arrival time and margin, on its own page on Apple Watch.</p></li>
+      <li><h3>Cutoff alerts</h3><p>A tap on your wrist when your margin drops below 15 minutes, and again each time it shrinks by another 10.</p></li>
+      <li><h3>Aid stops</h3><p>A rest timer starts as you reach an aid station, and stops as you leave.</p></li>
+      <li><h3>Paste the list</h3><p>Copy the stops and cutoffs from the race website, and paste them onto the route.</p></li>
+    </ul>
+  </div>
+</section>
+
+<section class="section" id="navigation" aria-labelledby="navigation-title">
+  <div class="wrap">
+    <div class="center reveal">
+      <p class="eyebrow">Navigation</p>
+      <h2 id="navigation-title">Quiet until it matters.</h2>
+      <p class="lede">Turn alerts and Off Route on your wrist and your Lock Screen, and every climb before you reach it. Nothing to set up before you leave, and nothing that cries wolf.</p>
+    </div>
+    <div class="tiles">
+      <article class="tile tile--off reveal">
+        <h3>Off Route, and the way back</h3>
+        <p>Off Route waits until you really are off the route, so a switchback won’t set it off. Then it gives you the distance and the direction, on the map, on your wrist and, with iPhone locked, on the Lock Screen.</p>
+        <figure class="tile__fig">
+          <div class="phone">
+            <div class="phone__body"><div class="phone__glass"><div class="phone__screen">
+              <img src="assets/shots/off-route.jpg" width="720" height="1564" loading="lazy" decoding="async"
+                   alt="Off Route on iPhone: a red banner reads Off Route · 90 m, Proceed to Route, with a dotted line from your position back to the magenta route.">
+            </div></div></div>
+          </div>
+        </figure>
+      </article>
+      <article class="tile tile--wrist reveal d1">
+        <h3>On your wrist</h3>
+        <p>A distinct tap for each kind of alert, so you know what it is before you look.</p>
+        <figure class="tile__fig">
+          <div class="watch">
+            <div class="watch__case"><div class="watch__glass"><div class="watch__screen">
+              <img src="assets/watch/off-route.png" width="400" height="487" loading="lazy" decoding="async"
+                   alt="Off Route on Apple Watch: an arrow pointing back to the route, 50 m, Proceed to Route.">
+            </div></div></div>
+          </div>
+        </figure>
+      </article>
+      <article class="tile tile--compass reveal d2">
+        <h3>Route compass</h3>
+        <p>How far you are from the line, and which way the next turn goes.</p>
+        <figure class="tile__fig">
+          <div class="watch">
+            <div class="watch__case"><div class="watch__glass"><div class="watch__screen">
+              <img src="assets/watch/route-compass.png" width="400" height="487" loading="lazy" decoding="async"
+                   alt="The route compass on Apple Watch: 18 m right of route, turn left in 120 m towards Red Tarn, 6.2 km and ↑ 480 m left.">
+            </div></div></div>
+          </div>
+        </figure>
+      </article>
+      <article class="tile tile--turn reveal">
+        <h3>Turn alerts for any route</h3>
+        <p>GPX files from anywhere included, timed for walking or running speed.</p>
+        <figure class="tile__fig">
+          <div class="phone">
+            <div class="phone__body"><div class="phone__glass"><div class="phone__screen">
+              <img src="assets/shots/turn-alert.jpg" width="720" height="698" loading="lazy" decoding="async"
+                   alt="A turn alert on iPhone during a trail run: 60 m, Bear right, arriving 11:20 am.">
+            </div></div></div>
+          </div>
+        </figure>
+      </article>
+      <article class="tile tile--climbs reveal d1">
+        <h3>Climbs ahead</h3>
+        <p>Every climb is found before you set off. A tap on your wrist as each one nears, and another at the top.</p>
+        <figure class="tile__fig">
+          <div class="shot">
+            <img src="assets/shots/climbs.jpg" width="720" height="660" loading="lazy" decoding="async"
+                 alt="The route’s elevation profile with its climbs: Climb 1, 5.6 km with ↑ 790 m at 14%, and Descent 1, 6.4 km with ↓ 791 m.">
+          </div>
+        </figure>
+      </article>
+      <article class="tile tile--back reveal d2">
+        <div>
+          <h3>Back to Start</h3>
+          <p>One tap from anywhere, and your recording carries on. Reverse Route turns the whole line around.</p>
+        </div>
+        <svg viewBox="0 0 300 150" aria-hidden="true" focusable="false">
+          <defs><filter id="bts-glow" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="5"/></filter></defs>
+          <path d="M28 118 C 70 116, 84 74, 128 70 S 196 92, 226 52 S 262 18, 276 30" stroke="#409CFF" stroke-width="9" stroke-linecap="round" fill="none" opacity=".45" filter="url(#bts-glow)"/>
+          <path d="M28 118 C 70 116, 84 74, 128 70 S 196 92, 226 52 S 262 18, 276 30" stroke="#409CFF" stroke-width="3" stroke-linecap="round" fill="none"/>
+          <path d="M276 30 C 250 70, 200 120, 40 124" stroke="#F2F2EE" stroke-opacity=".7" stroke-width="2" stroke-dasharray="2 7" stroke-linecap="round" fill="none"/>
+          <circle cx="28" cy="118" r="8" fill="#FF4FB2" stroke="#07090D" stroke-width="3"/>
+          <circle cx="276" cy="30" r="8" fill="#409CFF" stroke="#F2F2EE" stroke-width="3"/>
+        </svg>
+      </article>
+    </div>
+    <p class="attrib">Map data © OpenStreetMap contributors · © OpenMapTiles · OpenFreeMap</p>
+  </div>
+</section>
+
+<section class="section" id="offline" aria-labelledby="offline-title">
+  <div class="wrap split">
+    <div class="split__copy reveal">
+      <p class="eyebrow">Offline Maps</p>
+      <h2 id="offline-title">Maps that don’t need a signal.</h2>
+      <p class="lede">Choose the squares you want, or a corridor along your route, and see the size before you download. Maps are drawn on your iPhone and Apple Watch from compact vector data, so a whole national park fits in tens of megabytes.</p>
+    </div>
+    <div class="split__stage stage solo reveal d1">
+      <figure class="phone">
+        <div class="phone__body"><div class="phone__glass"><div class="phone__screen">
+          <img src="assets/shots/offline-grid.jpg" width="720" height="1564" loading="lazy" decoding="async"
+               alt="Download Area on iPhone: four squares of the northern Lake District selected, from Keswick towards Windermere, 9.69 MB.">
+        </div></div></div>
+      </figure>
+      <figure class="float">
+        <img src="assets/shots/offline-card.jpg" width="720" height="163" loading="lazy" decoding="async"
+             alt="From Offline Maps on iPhone: Offline Map 5 Nov, downloading, 79%, 6.42 MB of 9.69 MB.">
+      </figure>
+      <p class="attrib">Map data © OpenStreetMap contributors · © OpenMapTiles · OpenFreeMap</p>
+    </div>
+    <ul class="specs reveal">
+      <li><h3>Ready offline</h3><p>Shown only once every tile has been checked, so you know before you leave.</p></li>
+      <li><h3>Use Only Offline Maps</h3><p>Stops every map request. Anywhere you haven’t downloaded shows hatched.</p></li>
+      <li><h3>Hillshade and contours</h3><p>Shaded relief and contour lines from public elevation data, under every path and label.</p></li>
+      <li><h3>Open map data</h3><p>OpenStreetMap, served by OpenFreeMap, from the Lake District and Eryri to the Alps and the Rockies.</p></li>
+    </ul>
+  </div>
+</section>
+
+<section class="section" id="plan" aria-labelledby="plan-title">
+  <div class="wrap split split--flip">
+    <div class="split__copy reveal">
+      <p class="eyebrow">Plan and import</p>
+      <h2 id="plan-title">Tap to plan. Import any GPX.</h2>
+      <p class="lede">Tap the map to add points, joined by straight lines, and watch the distance, ascent and time add up. For a route that follows the path, import a GPX from any app or website.</p>
+    </div>
+    <div class="split__stage stage pair reveal d1">
+      <figure class="phone">
+        <div class="phone__body"><div class="phone__glass"><div class="phone__screen">
+          <img src="assets/shots/planner.jpg" width="720" height="1564" loading="lazy" decoding="async"
+               alt="The planner on iPhone: seven points joined by straight magenta lines from Glenridding over Helvellyn to Seat Sandal, with 8.0 km, 1,300 m of ascent and a run time of 2 h 5 min.">
+        </div></div></div>
+      </figure>
+      <figure class="phone">
+        <div class="phone__body"><div class="phone__glass"><div class="phone__screen">
+          <img src="assets/shots/route-profile.jpg" width="720" height="1564" loading="lazy" decoding="async"
+               alt="The Route Profile sheet: 8.0 km, ↑ 1,300 m, a profile coloured by grade, three numbered climbs, and an estimate for a hike or a trail run.">
+        </div></div></div>
+      </figure>
+      <p class="attrib">Map data © OpenStreetMap contributors · © OpenMapTiles · OpenFreeMap</p>
+    </div>
+    <ul class="specs reveal">
+      <li><h3>Route Profile</h3><p>A grade-coloured elevation profile, with every climb numbered.</p></li>
+      <li><h3>Hike or Trail Run</h3><p>An estimated time for each, from the same line.</p></li>
+      <li><h3>GPX in and out</h3><p>Import from Files, Mail or AirDrop. Export any route or activity.</p></li>
+      <li><h3>Send to Apple Watch</h3><p>New routes can go to your watch on their own, with the offline map that covers them.</p></li>
+    </ul>
+  </div>
+</section>
+
+<section class="section" id="watch" aria-labelledby="watch-title">
+  <div class="wrap">
+    <div class="center reveal">
+      <p class="eyebrow">Apple Watch</p>
+      <h2 id="watch-title">A watch that stands on its own.</h2>
+      <p class="lede">Ridgeway opens to a full-screen topo map. Follow a route, record, reverse it or head Back to Start with your iPhone left at home, and download maps on the watch itself over Wi-Fi or cellular.</p>
+    </div>
+    <ul class="watches">
+      <li class="reveal">
+        <div class="watch"><div class="watch__case"><div class="watch__glass"><div class="watch__screen">
+          <img src="assets/watch/map.jpg" width="400" height="487" loading="lazy" decoding="async"
+               alt="The map page: the route, your position and heading, and the next turn in 210 m.">
+        </div></div></div></div>
+        <h3>Map</h3><p>Heading-up, with the next turn. Turn the Digital Crown to zoom.</p>
+      </li>
+      <li class="reveal d1">
+        <div class="watch"><div class="watch__case"><div class="watch__glass"><div class="watch__screen">
+          <img src="assets/watch/run.png" width="400" height="487" loading="lazy" decoding="async"
+               alt="The run page: time, distance, pace, heart rate, a Lap button and the battery forecast.">
+        </div></div></div></div>
+        <h3>Run</h3><p>Time, pace and heart rate, and the battery you’ll finish with.</p>
+      </li>
+      <li class="reveal d2">
+        <div class="watch"><div class="watch__case"><div class="watch__glass"><div class="watch__screen">
+          <img src="assets/watch/next-aid.png" width="400" height="487" loading="lazy" decoding="async"
+               alt="The Next Aid page: distance, climb, arrival time and the margin before the cutoff.">
+        </div></div></div></div>
+        <h3>Next Aid <span class="plus"><span class="vh">Part of Ridgeway </span>Plus</span></h3><p>The next aid station, and your time in hand.</p>
+      </li>
+      <li class="reveal d3">
+        <div class="watch"><div class="watch__case"><div class="watch__glass"><div class="watch__screen">
+          <img src="assets/watch/route-compass.png" width="400" height="487" loading="lazy" decoding="async"
+               alt="The route compass: distance from the route and the next turn.">
+        </div></div></div></div>
+        <h3>Route Compass</h3><p>Where the line is, and where it goes next.</p>
+      </li>
+      <li class="reveal d3">
+        <div class="watch"><div class="watch__case"><div class="watch__glass"><div class="watch__screen">
+          <img src="assets/watch/off-route.png" width="400" height="487" loading="lazy" decoding="async"
+               alt="Off Route: the distance and direction back to the route.">
+        </div></div></div></div>
+        <h3>Off Route</h3><p>The distance and the direction back, in one glance.</p>
+      </li>
+    </ul>
+    <p class="attrib">Map data © OpenStreetMap contributors · © OpenMapTiles · OpenFreeMap</p>
+  </div>
+</section>
+
+<section class="section" id="you" aria-labelledby="you-title">
+  <div class="wrap split">
+    <div class="split__copy reveal">
+      <p class="eyebrow">You <span class="plus"><span class="vh">Part of Ridgeway </span>Plus</span></p>
+      <h2 id="you-title">Everywhere you’ve been.</h2>
+      <p class="lede">Bring in your hiking, walking and trail-running workouts from Apple Health, routes and all, and see how far you’ve gone, how much you’ve climbed and a map of everywhere you’ve been. Road runs stay out, and your history stays on your iPhone.</p>
+    </div>
+    <div class="split__stage stage pair reveal d1">
+      <figure class="phone">
+        <div class="phone__body"><div class="phone__glass"><div class="phone__screen">
+          <img src="assets/shots/you.jpg" width="720" height="1564" loading="lazy" decoding="async"
+               alt="The You tab on iPhone: 3,479 km across 290 hikes, walks and trail runs, 230,108 m climbed, a chart of the climb since 2021, and a world map of where the activities were.">
+        </div></div></div>
+      </figure>
+      <figure class="phone">
+        <div class="phone__body"><div class="phone__glass"><div class="phone__screen">
+          <img src="assets/shots/you-world-map.jpg" width="720" height="1564" loading="lazy" decoding="async"
+               alt="The world map in the You tab: 173 activities clustered in the United Kingdom and 54 in the Alps.">
+        </div></div></div>
+      </figure>
+      <p class="attrib">Shown with sample history.</p>
+    </div>
+    <ul class="specs reveal">
+      <li><h3>All time, year, month</h3><p>Distance, climb, time and active days, with your climb drawn over the years.</p></li>
+      <li><h3>The world map</h3><p>Every activity on one map, grouped by where it happened.</p></li>
+    </ul>
+  </div>
+</section>
+
+<section class="section" id="styles" aria-labelledby="styles-title">
+  <div class="wrap">
+    <div class="center reveal">
+      <p class="eyebrow">Map styles</p>
+      <h2 id="styles-title">Five map styles, day or night.</h2>
+      <p class="lede">Standard Light, Standard Dark and Minimal Light, plus Hiking Pro and Tactical with Ridgeway Plus. Hiking Pro shows everything: 10 m contours, rock and scree, path types and summit heights. Tactical is red on black, and keeps your night vision.</p>
+    </div>
+    <ul class="styles">
+      <li class="reveal">
+        <div class="phone"><div class="phone__body"><div class="phone__glass"><div class="phone__screen">
+          <img src="assets/shots/map-standard-dark.jpg" width="720" height="1564" loading="lazy" decoding="async"
+               alt="The route in Standard Dark.">
+        </div></div></div></div>
+        <h3>Standard Dark</h3>
+      </li>
+      <li class="reveal d1">
+        <div class="phone"><div class="phone__body"><div class="phone__glass"><div class="phone__screen">
+          <img src="assets/shots/style-standard-light.jpg" width="480" height="1043" loading="lazy" decoding="async"
+               alt="The route in Standard Light: a pale topo map with the route in magenta.">
+        </div></div></div></div>
+        <h3>Standard Light</h3>
+      </li>
+      <li class="reveal d2">
+        <div class="phone"><div class="phone__body"><div class="phone__glass"><div class="phone__screen">
+          <img src="assets/shots/style-hiking-pro.jpg" width="480" height="1043" loading="lazy" decoding="async"
+               alt="The route in Hiking Pro: a paper topo map with dense contours, rock and paths, and the route in dark magenta.">
+        </div></div></div></div>
+        <h3>Hiking Pro <span class="plus"><span class="vh">Part of Ridgeway </span>Plus</span></h3>
+      </li>
+      <li class="reveal d3">
+        <div class="phone"><div class="phone__body"><div class="phone__glass"><div class="phone__screen">
+          <img src="assets/shots/style-tactical.jpg" width="480" height="1043" loading="lazy" decoding="async"
+               alt="The route in Tactical: the map and the app drawn in red on black.">
+        </div></div></div></div>
+        <h3>Tactical <span class="plus"><span class="vh">Part of Ridgeway </span>Plus</span></h3>
+      </li>
+    </ul>
+    <p class="attrib">Map data © OpenStreetMap contributors · © OpenMapTiles · OpenFreeMap</p>
+  </div>
+</section>
+
+<section class="section privacy" id="privacy" aria-labelledby="privacy-title">
+  <div class="wrap center reveal">
+    <h2 id="privacy-title"><span>No account.</span> <span>No ads.</span> <span>No tracking.</span></h2>
+    <p class="lede">Your routes and activities stay on your iPhone and Apple Watch. There is no Ridgeway server, and the developer collects no data. Ridgeway goes online for map tiles, and Use Only Offline Maps turns that off.</p>
+    <a class="more" href="privacy/#network">Every request it makes, in the privacy policy</a>
+  </div>
+</section>
+
+<section class="section" id="plus" aria-labelledby="plus-title">
+  <div class="wrap">
+    <div class="center reveal">
+      <p class="eyebrow">Ridgeway Plus</p>
+      <h2 id="plus-title">One purchase, shared with your family.</h2>
+      <p class="lede">Everything that gets you there and back is free, on iPhone and Apple Watch. Ridgeway Plus is an optional one-time purchase, shared through Family Sharing, that adds three things.</p>
+    </div>
+    <ul class="plus-cards">
+      <li class="reveal">
+        <div class="peek" aria-hidden="true"><img src="assets/shots/you.jpg" width="720" height="1564" loading="lazy" decoding="async" alt="" style="margin-top:-23.5%"></div>
+        <h3>Your history</h3>
+        <p>Your Apple Health history, all-time totals and highlights, and the world map in the You tab.</p>
+      </li>
+      <li class="reveal d1">
+        <div class="peek" aria-hidden="true"><img src="assets/shots/style-hiking-pro.jpg" width="480" height="1043" loading="lazy" decoding="async" alt="" style="margin-top:-62%"></div>
+        <h3>Hiking Pro and Tactical</h3>
+        <p>Two more map styles, on iPhone and Apple Watch.</p>
+      </li>
+      <li class="reveal d2">
+        <div class="peek" aria-hidden="true"><img src="assets/shots/race-day.jpg" width="720" height="1564" loading="lazy" decoding="async" alt="" style="margin-top:-102%"></div>
+        <h3>Race Day</h3>
+        <p>Aid stations and cutoffs, arrival times and margins, and the Next Aid page on your wrist.</p>
+      </li>
+    </ul>
+    <div class="free reveal">
+      <h3>Always free</h3>
+      <ul>
+        <li>Offline maps, any area</li>
+        <li>Planning, and GPX in and out</li>
+        <li>Navigation and turn alerts</li>
+        <li>Off Route and Back to Start</li>
+        <li>Climbs and the route compass</li>
+        <li>Recording, saved to Apple Health</li>
+        <li>Trail Run, with splits and fuel timers</li>
+        <li>Low-battery alerts and GPS modes</li>
+      </ul>
+      <p>No subscription, no pop-ups, and never a prompt during an activity. Safety never needs Ridgeway Plus.</p>
+    </div>
+  </div>
+</section>
+
+<section class="close" id="app-store" aria-labelledby="close-title">
+  <div class="wrap reveal">
+    <img class="close__icon" src="assets/icon-256.png" width="256" height="256" loading="lazy" decoding="async" alt="">
+    <h2 id="close-title">Plan tonight. <span>Leave your phone in the pack.</span></h2>
+    <!-- TODO(App Store): replace href="#app-store" with the listing URL, as in the hero. -->
+    <a class="badge" href="#app-store"><img src="assets/favicon.svg" width="34" height="34" alt=""><span><small>Download on the</small> <strong>App Store</strong></span></a>
+    <p class="close__fine">For iPhone with iOS 26 or later, and Apple Watch with watchOS 26 or later.</p>
+  </div>
+  <div class="ridge reveal" aria-hidden="true">
+<!-- profile: art/route-profile.svg from tools/art (the illustrative route's elevation). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 240" preserveAspectRatio="none" fill="none" aria-hidden="true" focusable="false">
+<defs><linearGradient id="rw-pf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#409CFF" stop-opacity=".22"/><stop offset="1" stop-color="#409CFF" stop-opacity="0"/></linearGradient>
+<clipPath id="rw-pc"><rect class="rw-preveal" width="1200" height="240"/></clipPath></defs>
+<style>
+.rw-pfill{fill:url(#rw-pf)}
+.rw-pbase{stroke:var(--rw-contour,#AABEDC);stroke-opacity:.18;stroke-width:1px;vector-effect:non-scaling-stroke}
+.rw-pline{stroke:var(--rw-route,#409CFF);stroke-width:2px;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.rw-pdraw{stroke-dasharray:1;stroke-dashoffset:0}
+@media (prefers-reduced-motion:no-preference){
+.rw-pdraw{stroke-dashoffset:1;animation:rw-draw var(--rw-dur,3.2s) cubic-bezier(.45,.05,.2,1) var(--rw-delay,.5s) forwards}
+.rw-preveal{transform:scaleX(0);animation:rw-reveal var(--rw-dur,3.2s) cubic-bezier(.45,.05,.2,1) var(--rw-delay,.5s) forwards}
+}
+@keyframes rw-draw{to{stroke-dashoffset:0}}
+@keyframes rw-reveal{to{transform:scaleX(1)}}
+</style>
+<path class="rw-pbase" d="M0 239.5H1200"/>
+<path class="rw-pfill" clip-path="url(#rw-pc)" d="M0.0 209.0L14.8 208.2 30.8 208.3 45.6 204.7 55.6 203.6 64.8 201.7 76.1 200.3 86.2 197.2 110.2 188.1 134.6 175.3 148.5 166.4 160.0 157.2 190.6 129.3 202.1 123.1 218.2 113.3 243.7 93.1 250.3 89.1 255.4 86.8 277.5 82.8 297.8 85.9 316.6 86.3 329.0 87.3 338.9 86.8 351.2 83.1 364.0 80.9 380.5 76.8 401.7 70.4 407.8 68.0 417.7 62.6 422.8 60.9 436.5 58.9 450.3 54.6 461.5 52.8 465.2 53.1 480.4 56.9 504.1 57.3 510.4 58.5 513.0 58.5 518.1 55.7 530.7 43.3 536.9 39.1 553.1 31.9 564.8 30.8 570.9 31.6 574.0 33.1 579.1 38.4 583.2 44.7 586.9 49.1 591.9 53.1 597.9 56.2 601.4 56.8 611.0 56.0 627.3 58.3 643.3 57.7 648.9 60.3 668.6 74.7 681.1 80.6 687.4 81.9 698.7 82.9 711.4 84.9 727.5 85.5 739.9 86.6 743.6 87.6 762.1 96.9 771.3 102.6 776.8 106.7 785.6 115.6 791.7 119.8 800.3 124.4 812.5 129.0 816.2 129.8 826.0 129.8 843.5 131.8 873.0 132.0 886.5 130.7 892.7 130.8 900.0 132.5 917.5 139.1 929.6 141.1 937.2 144.8 947.1 151.4 959.6 165.9 971.2 175.8 977.5 179.9 986.9 183.6 1000.8 187.3 1026.8 192.2 1050.1 195.1 1063.7 196.0 1083.3 200.3 1094.4 200.7 1107.9 199.9 1126.3 201.5 1155.8 205.2 1168.1 207.9 1184.0 209.8 1200.0 209.4L1200 240L0 240Z"/>
+<path class="rw-pline" clip-path="url(#rw-pc)" d="M0.0 209.0L14.8 208.2 30.8 208.3 45.6 204.7 55.6 203.6 64.8 201.7 76.1 200.3 86.2 197.2 110.2 188.1 134.6 175.3 148.5 166.4 160.0 157.2 190.6 129.3 202.1 123.1 218.2 113.3 243.7 93.1 250.3 89.1 255.4 86.8 277.5 82.8 297.8 85.9 316.6 86.3 329.0 87.3 338.9 86.8 351.2 83.1 364.0 80.9 380.5 76.8 401.7 70.4 407.8 68.0 417.7 62.6 422.8 60.9 436.5 58.9 450.3 54.6 461.5 52.8 465.2 53.1 480.4 56.9 504.1 57.3 510.4 58.5 513.0 58.5 518.1 55.7 530.7 43.3 536.9 39.1 553.1 31.9 564.8 30.8 570.9 31.6 574.0 33.1 579.1 38.4 583.2 44.7 586.9 49.1 591.9 53.1 597.9 56.2 601.4 56.8 611.0 56.0 627.3 58.3 643.3 57.7 648.9 60.3 668.6 74.7 681.1 80.6 687.4 81.9 698.7 82.9 711.4 84.9 727.5 85.5 739.9 86.6 743.6 87.6 762.1 96.9 771.3 102.6 776.8 106.7 785.6 115.6 791.7 119.8 800.3 124.4 812.5 129.0 816.2 129.8 826.0 129.8 843.5 131.8 873.0 132.0 886.5 130.7 892.7 130.8 900.0 132.5 917.5 139.1 929.6 141.1 937.2 144.8 947.1 151.4 959.6 165.9 971.2 175.8 977.5 179.9 986.9 183.6 1000.8 187.3 1026.8 192.2 1050.1 195.1 1063.7 196.0 1083.3 200.3 1094.4 200.7 1107.9 199.9 1126.3 201.5 1155.8 205.2 1168.1 207.9 1184.0 209.8 1200.0 209.4"/>
+</svg>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot__top">
+      <a class="brand" href="./"><img src="assets/favicon.svg" width="30" height="30" alt="">Ridgeway</a>
+      <nav aria-label="Footer">
+        <a href="privacy/">Privacy</a>
+        <a href="support/">Support</a>
+        <a href="mailto:support@enalmar.uk">support@enalmar.uk</a>
+      </nav>
+    </div>
+    <div class="foot__fine">
+      <p>Map data © OpenStreetMap contributors · © OpenMapTiles · OpenFreeMap. Elevation from public terrain datasets. The contours behind this page are the fells around Helvellyn.</p>
+      <p>Apple, Apple Watch, iPhone and App Store are trademarks of Apple Inc., registered in the U.S. and other countries.</p>
+      <p>© 2026 enalmar.uk</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* The bar gains its glass once the page moves; sections rise into view; and where scroll-driven
+   animations are missing, the hero light still fades as you scroll away from it. */
+(function () {
+  var root = document.documentElement;
+  var bar = document.getElementById('bar');
+  var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function onScroll() { bar.classList.toggle('is-stuck', scrollY > 4); }
+  addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  if (!(window.CSS && CSS.supports('animation-timeline: scroll()'))) {
+    var terrain = document.querySelector('.terrain'), ticking = false;
+    var fade = function () {
+      ticking = false;
+      terrain.style.setProperty('--fade', Math.max(0, 1 - scrollY / (innerHeight * 1.1)).toFixed(3));
+    };
+    addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(fade); } }, { passive: true });
+    fade();
+  }
+
+  if (still || !('IntersectionObserver' in window)) return;
+  var items = document.querySelectorAll('.reveal');
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
+  root.classList.add('js-reveal');
+  items.forEach(function (el) { io.observe(el); });
+
+  // Backstop: if anything well inside the viewport is still hidden after a few seconds, the
+  // observer is not firing here (a background tab, an odd embed), so show everything.
+  setTimeout(function () {
+    var stuck = Array.prototype.some.call(items, function (el) {
+      var r = el.getBoundingClientRect();
+      return !el.classList.contains('in') && r.top < innerHeight * 0.6 && r.bottom > 0;
+    });
+    if (stuck) { io.disconnect(); root.classList.remove('js-reveal'); }
+  }, 4000);
+})();
+</script>
+</body>
+</html>

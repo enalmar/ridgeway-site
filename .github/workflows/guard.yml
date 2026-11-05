@@ -1,0 +1,51 @@
+name: guard
+
+# Runs on every push and pull request. Catches the two things that actually
+# hurt: a credential committed by accident, and a file too big for GitHub.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  secrets:
+    name: secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  hygiene:
+    name: file hygiene
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: no files over 45MB
+        run: |
+          big=$(find . -path ./.git -prune -o -type f -size +45M -print)
+          if [ -n "$big" ]; then
+            echo "::error::files over 45MB are tracked:"; echo "$big"; exit 1
+          fi
+          echo "no oversized files"
+      - name: no NAS or OS artefacts
+        run: |
+          junk=$(git ls-files | grep -E "(^|/)(\.smbdelete|\.DS_Store)" || true)
+          if [ -n "$junk" ]; then
+            echo "::error::filesystem artefacts are tracked:"; echo "$junk"; exit 1
+          fi
+          echo "clean"
+      - name: no committed env files
+        run: |
+          env=$(git ls-files | grep -E "(^|/)\.env($|\.)" | grep -v example || true)
+          if [ -n "$env" ]; then
+            echo "::error::env files are tracked:"; echo "$env"; exit 1
+          fi
+          echo "clean"
