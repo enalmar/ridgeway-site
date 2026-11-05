@@ -1,12 +1,17 @@
 #!/bin/sh
 # Rebuild every non-capture art asset for the Ridgeway site, in order.
 # Needs: python3 (standard library only), swift, curl, Google Chrome (headless, for og.png).
-#   sh art/tools/build.sh            from the ridgeway-site-assets-raw folder, or from anywhere
+#   APPICON=path/to/AppIcon-1024.png sh art/tools/build.sh
+# APPICON is the app's 1024 px icon (App/iOS/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png in the
+# app repository). It is required: there is no default, so no local path is published with the site.
 set -eu
+if [ -z "${APPICON:-}" ] || [ ! -f "$APPICON" ]; then
+  echo "usage: APPICON=path/to/AppIcon-1024.png sh $0" >&2
+  exit 64
+fi
 HERE=$(cd "$(dirname "$0")" && pwd)
 ART="$HERE/.."
 DEM="$ART/../dem-tiles"
-APPICON=${APPICON:-/Users/eam/Dev/hiking-maps-trailrun/App/iOS/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png}
 
 sh "$HERE/fetch_dem.sh"
 python3 -I "$HERE/dem.py" "$DEM" 13 4025 4029 2608 2611 "$DEM/helvellyn_z13"

@@ -29,7 +29,7 @@ PHONE = [
     ("trail-run-dashboard", "trail-run", 720, 84, None),
     ("race-day", "race-day", 720, 84, None),
     ("off-route", "off-route", 720, 84, None),
-    ("run-navigation-map", "turn-alert", 720, 84, (0, 0, 1320, 1280)),      # the turn banner
+    ("run-navigation-map", "turn-alert", 720, 84, (0, 0, 1320, 1900)),      # the turn banner and the route
     ("route-detail-profile", "climbs", 720, 84, (0, 1030, 1320, 2240)),  # Elevation and Climbs
     ("offline-grid", "offline-grid", 720, 84, None),
     ("offline-downloading", "offline-card", 720, 86, (60, 1171, 1260, 1442)),  # the In Progress card
@@ -38,7 +38,9 @@ PHONE = [
     ("you-stats-map", "you", 720, 84, None),
     ("you-world-map", "you-world-map", 720, 84, None),
     ("map-standard-light", "style-standard-light", 480, 80, None),
+    ("map-minimal-light", "style-minimal-light", 480, 80, None),
     ("map-hiking-pro", "style-hiking-pro", 480, 80, None),
+    ("map-hiking-pro", "style-hiking-pro-detail", 360, 84, (100, 1240, 620, 1760)),  # Helvellyn at full size
     ("map-tactical", "style-tactical", 480, 80, None),
 ]
 

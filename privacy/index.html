@@ -86,14 +86,14 @@
   <h2 id="network">4. Network requests</h2>
   <p>Ridgeway works without a connection. When you are online it makes only these requests:</p>
   <div class="table" role="region" aria-label="Network requests" tabindex="0">
-    <table>
-      <thead><tr><th scope="col">What</th><th scope="col">Who serves it</th><th scope="col">What they can see</th></tr></thead>
-      <tbody>
-        <tr><td>Map tiles for the area you view or download</td><td>OpenFreeMap (openfreemap.org), served through Cloudflare</td><td>which map tiles are requested (so roughly which area you are looking at), your IP address, and the app’s name and version in the User-Agent</td></tr>
-        <tr><td>Terrain (elevation) tiles</td><td>Terrain Tiles on Amazon Web Services (s3.amazonaws.com)</td><td>the same, for terrain tiles</td></tr>
-        <tr><td>The current OpenFreeMap map version</td><td>OpenFreeMap</td><td>your IP address</td></tr>
-        <tr><td>The world map in the You tab (Ridgeway Plus)</td><td>Apple MapKit</td><td>what Apple’s Maps privacy policy describes</td></tr>
-        <tr><td>The Ridgeway Plus purchase</td><td>the App Store</td><td>what Apple’s App Store privacy policy describes; Ridgeway only learns whether Plus is unlocked</td></tr>
+    <table role="table">
+      <thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader">What</th><th scope="col" role="columnheader">Who serves it</th><th scope="col" role="columnheader">What they can see</th></tr></thead>
+      <tbody role="rowgroup">
+        <tr role="row"><td role="cell" data-label="What">Map tiles for the area you view or download</td><td role="cell" data-label="Who serves it">OpenFreeMap (openfreemap.org), served through Cloudflare</td><td role="cell" data-label="What they can see">which map tiles are requested (so roughly which area you are looking at), your IP address, and the app’s name and version in the User-Agent</td></tr>
+        <tr role="row"><td role="cell" data-label="What">Terrain (elevation) tiles</td><td role="cell" data-label="Who serves it">Terrain Tiles on Amazon Web Services (s3.amazonaws.com)</td><td role="cell" data-label="What they can see">the same, for terrain tiles</td></tr>
+        <tr role="row"><td role="cell" data-label="What">The current OpenFreeMap map version</td><td role="cell" data-label="Who serves it">OpenFreeMap</td><td role="cell" data-label="What they can see">your IP address</td></tr>
+        <tr role="row"><td role="cell" data-label="What">The world map in the You tab (Ridgeway Plus)</td><td role="cell" data-label="Who serves it">Apple MapKit</td><td role="cell" data-label="What they can see">what Apple’s Maps privacy policy describes</td></tr>
+        <tr role="row"><td role="cell" data-label="What">The Ridgeway Plus purchase</td><td role="cell" data-label="Who serves it">the App Store</td><td role="cell" data-label="What they can see">what Apple’s App Store privacy policy describes; Ridgeway only learns whether Plus is unlocked</td></tr>
       </tbody>
     </table>
   </div>

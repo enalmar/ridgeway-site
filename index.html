@@ -26,7 +26,7 @@
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="assets/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-<!-- TODO(App Store): add "downloadUrl":"https://apps.apple.com/app/id<APPLE_ID>" once the listing is live. -->
+<!-- STAGED: at launch, add "downloadUrl":"https://apps.apple.com/app/idAPPLE_ID" to the JSON-LD below. -->
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"SoftwareApplication",
  "name":"Ridgeway","alternateName":"Ridgeway: Hike & Trail Run",
@@ -214,6 +214,7 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
 .watch__screen img { width: 100%; height: 100%; }
 
 .attrib { font-size: 12px; line-height: 1.4; color: var(--ink-3); letter-spacing: .005em; }
+.nw { white-space: nowrap; }
 
 /* ---- Hero --------------------------------------------------------------------------------- */
 .hero { position: relative; padding-block: clamp(28px, 6vh, 72px) clamp(64px, 10vh, 120px); overflow-x: clip; }
@@ -228,22 +229,28 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
 .more { font-weight: 500; font-size: 17px; white-space: nowrap; }
 .more::after { content: " \203A"; }
 
-.badge {
-  display: inline-flex; align-items: center; gap: 12px; height: 58px; padding: 0 22px 0 14px; border-radius: 15px;
-  background: #000; color: #fff; border: 1px solid rgba(255, 255, 255, .42);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, .6), 0 12px 32px -12px rgba(64, 156, 255, .45);
-  transition: border-color .2s ease, transform .2s ease;
+/* Before launch: a quiet status pill, not a link. At launch: .get, a plain text button (never a
+   copy of Apple's badge; the official badge, if wanted, comes from Apple's marketing resources). */
+.soon {
+  display: inline-flex; align-items: center; gap: 11px; height: 48px; padding: 0 20px 0 17px; border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .16); background: rgba(255, 255, 255, .035);
+  color: var(--ink); font-size: 15.5px; font-weight: 600; letter-spacing: -.005em; white-space: nowrap;
 }
-.badge:hover { text-decoration: none; border-color: rgba(255, 255, 255, .9); }
-.badge:active { transform: scale(.98); }
-.badge img { width: 34px; height: 34px; }
-.badge span { display: flex; flex-direction: column; line-height: 1.08; }
-.badge small { font-size: 11.5px; font-weight: 500; letter-spacing: .01em; }
-.badge strong { font-size: 22px; font-weight: 600; letter-spacing: -.015em; }
+.soon__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--blue);
+             box-shadow: 0 0 0 4px rgba(64, 156, 255, .16), 0 0 14px rgba(64, 156, 255, .7); }
+.get {
+  display: inline-flex; align-items: center; height: 50px; padding: 0 24px; border-radius: 999px;
+  background: var(--blue-fill); color: #fff; font-size: 16px; font-weight: 600; letter-spacing: -.005em;
+  transition: background-color .2s ease;
+}
+.get:hover { text-decoration: none; background: #2a76f0; }
 
-.hero__stage { position: relative; display: grid; place-items: center; padding-block: 12px 40px;
-               --pw: clamp(220px, min(22.5vw, (100svh - 210px) * .47), 312px); --ww: calc(var(--pw) * .6); }
-.hero__route { position: absolute; left: -68%; top: 48%; width: 200%; translate: 0 -50%; z-index: 0;
+.hero__stage { position: relative; display: grid; place-items: center; padding-block: 12px var(--foot);
+               --pw: clamp(220px, min(22.5vw, (100svh - 210px) * .47), 312px); --ww: calc(var(--pw) * .6);
+               --foot: 40px; /* room under the phone for the map attribution */ }
+/* The start dot sits at 89.4% of the route's width: left + width x .894 keeps it at ~95% of the stage,
+   inside the viewport at every width, with the far end faded out behind the copy. */
+.hero__route { position: absolute; left: -75%; top: 48%; width: 190%; translate: 0 -50%; z-index: 0;
                -webkit-mask: linear-gradient(90deg, transparent 22%, #000 36%); mask: linear-gradient(90deg, transparent 22%, #000 36%);
                --rw-dur: 3.4s; --rw-delay: .45s; --rw-glow: .55; --rw-ground: var(--ground); }
 .hero__route svg { width: 100%; height: auto; display: block; overflow: visible; }
@@ -252,8 +259,9 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
 .hero__route .rw-start { r: 14px; }
 .hero__route .rw-top { r: 8px; }
 .hero .phone { --w: var(--pw); position: relative; z-index: 2; }
-.hero .watch { --w: var(--ww); position: absolute; z-index: 3; bottom: 30px; left: calc(50% - var(--pw) * .5 - var(--ww) * .5); }
-.hero .attrib { position: absolute; z-index: 3; bottom: 0; left: 0; right: 0; text-align: center; }
+.hero .watch { --w: var(--ww); position: absolute; z-index: 3; bottom: calc(var(--foot) - 10px); left: calc(50% - var(--pw) * .5 - var(--ww) * .5); }
+.hero .attrib { position: absolute; z-index: 3; bottom: 0; left: 0; right: 0; text-align: center; text-wrap: balance; }
+@media (max-width: 1180px) { .hero__stage { --foot: 64px; } } /* the attribution may take two lines */
 @media (max-width: 900px) {
   .hero__grid { grid-template-columns: 1fr; min-height: 0; gap: 48px; }
   .hero__stage { --pw: min(64vw, 290px); margin-inline: auto; width: 100%; }
@@ -377,12 +385,16 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
 .tile--wrist .tile__fig, .tile--compass .tile__fig { padding-bottom: 30px; }
 .tile .watch { --w: clamp(150px, 13vw, 184px); }
 .tile--turn, .tile--climbs, .tile--back { grid-column: span 4; }
-.tile--turn .phone { --w: clamp(230px, 22vw, 290px); margin-bottom: -18px; }
-.tile--turn .phone__screen { aspect-ratio: 1320 / 1280; }
+/* The turn-alert phone takes whatever height the row leaves under the text (the Climbs tile sets
+   it) and runs off the bottom edge, so there is no gap between the words and the phone. */
+.tile--turn .tile__fig { flex: 1 1 0; height: 0; min-height: 0; margin: 0; padding-top: 26px; align-items: flex-start; }
+.tile--turn .phone { --w: clamp(240px, 23vw, 318px); }
+.tile--turn .phone__screen { aspect-ratio: 1320 / 1900; }
 .tile--climbs .tile__fig { padding-bottom: 30px; }
 .shot { overflow: hidden; border-radius: 18px; box-shadow: 0 0 0 1px rgba(255, 255, 255, .08), 0 24px 50px -20px rgba(0, 0, 0, .9); }
-.tile--back { justify-content: space-between; padding-bottom: 30px; }
-.tile--back svg { width: 100%; max-width: 300px; height: auto; margin: 26px auto 0; overflow: visible; }
+.tile--back { justify-content: space-between; padding-bottom: 0; }
+.tile--back .bts { display: block; flex: 1 1 0; width: calc(100% + 60px); height: 0; min-height: 0; margin: 14px -30px 0; }
+@media (max-width: 1000px) { .tile--back .bts { flex: none; height: auto; max-height: 300px; } }
 .tiles + .attrib { margin-top: 16px; text-align: center; }
 @media (max-width: 1000px) {
   .tile--off { grid-column: span 12; grid-row: auto; }
@@ -394,6 +406,9 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
   .tile { padding: 24px 22px 0; border-radius: 24px; }
   .tile--wrist, .tile--compass, .tile--turn, .tile--climbs { grid-column: span 12; }
   .tile--off .phone { --w: min(68vw, 290px); }
+  .tile--turn .tile__fig { flex: none; height: auto; }
+  .tile--turn .phone { --w: min(68vw, 290px); margin-bottom: calc(var(--w) * -.62); }
+  .tile--back .bts { width: calc(100% + 44px); margin-inline: -22px; }
 }
 
 /* ---- Apple Watch: the row of pages -------------------------------------------------------- */
@@ -413,12 +428,30 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
 
 /* ---- Map styles --------------------------------------------------------------------------- */
 .styles { list-style: none; margin: clamp(56px, 7vw, 88px) 0 0; padding: 0;
-          display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(18px, 3vw, 44px); }
-.styles li { display: flex; flex-direction: column; align-items: center; }
-.styles .phone { --w: min(100%, 262px); }
-.styles h3 { margin-top: 22px; display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 600; }
+          display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 48px clamp(16px, 2.2vw, 36px); }
+.styles li { display: flex; flex-direction: column; align-items: center; min-width: 0; }
+.styles .phone { --w: min(100%, 250px); }
+.styles__dev { position: relative; width: min(100%, 250px); }
+.styles__dev .phone { --w: 100%; }
+/* Hiking Pro at full size, in a loupe over the phone: the thumbnail alone looks like Standard Light. */
+.loupe { position: absolute; z-index: 1; right: 4%; bottom: 8%; width: 64%; aspect-ratio: 1; border-radius: 50%;
+         box-shadow: 0 0 0 2px #E9E6DD, 0 0 0 3px rgba(0, 0, 0, .55), 0 22px 44px -12px rgba(0, 0, 0, .95); }
+.styles h3 { margin-top: 22px; display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 600; text-align: center; }
 .styles + .attrib { margin-top: 28px; text-align: center; }
-@media (max-width: 760px) { .styles { grid-template-columns: 1fr 1fr; row-gap: 44px; } }
+@media (max-width: 1100px) {
+  /* three, then the two Plus styles */
+  .styles { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .styles li { grid-column: span 2; }
+  .styles li:nth-child(4) { grid-column: 2 / span 2; }
+  .styles .phone, .styles__dev { --w: min(100%, 236px); width: min(100%, 236px); }
+  .styles__dev .phone { --w: 100%; }
+}
+@media (max-width: 640px) {
+  .styles { grid-template-columns: 1fr 1fr; row-gap: 40px; }
+  .styles li, .styles li:nth-child(4) { grid-column: auto; }
+  .styles li:first-child { grid-column: 1 / -1; }
+  .styles li:first-child .phone { width: calc(50% - 8px); }
+}
 
 /* ---- Privacy ------------------------------------------------------------------------------ */
 .privacy h2 { font-size: clamp(42px, 7.6vw, 112px); line-height: .98; letter-spacing: -.042em; }
@@ -435,7 +468,8 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
                  padding: 0 28px 30px; }
 .plus-cards .peek { height: 190px; margin: 0 -28px 26px; overflow: hidden; position: relative; }
 .plus-cards .peek img { width: 100%; height: auto; }
-.plus-cards .peek::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 35%, #10141B 100%); }
+.plus-cards .peek::after { content: ""; position: absolute; inset: 0;
+                           background: linear-gradient(180deg, rgba(16, 20, 27, .9), transparent 18px, transparent 35%, #10141B 100%); }
 .plus-cards h3 { font-size: 20px; letter-spacing: -.015em; }
 .plus-cards p { margin-top: 8px; font-size: 15.5px; color: var(--ink-2); }
 .free { margin-top: clamp(40px, 5vw, 56px); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 16px 40px;
@@ -459,7 +493,7 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
                box-shadow: 0 0 0 1px rgba(255, 255, 255, .08), 0 24px 60px -16px rgba(64, 156, 255, .45); }
 .close h2 { font-size: clamp(36px, 5.4vw, 76px); line-height: 1.03; letter-spacing: -.036em; font-weight: 700; }
 .close h2 span { display: block; color: var(--ink-2); }
-.close .badge { margin-top: 40px; }
+.close .soon, .close .get { margin-top: 40px; }
 .close__fine { margin-top: 22px; font-size: 14px; color: var(--ink-3); }
 .ridge { position: relative; margin-top: clamp(64px, 9vw, 120px); height: clamp(120px, 16vw, 220px); --rw-dur: 3.6s; --rw-delay: .2s; }
 .ridge svg { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -481,6 +515,7 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
 .js-reveal .reveal.d1 { transition-delay: .08s; }
 .js-reveal .reveal.d2 { transition-delay: .16s; }
 .js-reveal .reveal.d3 { transition-delay: .24s; }
+.js-reveal .reveal.d4 { transition-delay: .32s; }
 </style>
 </head>
 <body>
@@ -502,8 +537,11 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
       <a href="#watch">Apple Watch</a>
       <a href="#plus">Ridgeway Plus</a>
     </nav>
-    <!-- TODO(App Store): point at the listing, as below. -->
-    <a class="bar__get" href="#app-store">Download</a>
+<!-- STAGED: App Store link (bar). No listing yet, so the bar has no download button.
+     On approval: remove this comment's markers and replace APPLE_ID with the numeric
+     Apple ID from App Store Connect (the same ID in all three staged links).
+    <a class="bar__get" href="https://apps.apple.com/app/idAPPLE_ID">Download</a>
+-->
   </div>
 </header>
 
@@ -516,9 +554,13 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
       <h1 id="hero-title">Trail runs and mountain days, <span>navigated offline.</span></h1>
       <p class="hero__lede">Topo maps that live on your iPhone and Apple Watch, with turn alerts on your wrist, every climb counted and the way back, all without a signal. No account, and navigation is never locked.</p>
       <div class="hero__actions">
-        <!-- TODO(App Store): replace href="#app-store" with https://apps.apple.com/app/id<APPLE_ID>
-             when the listing is live. Three links use it: here, the bar's Download and the closing section. -->
-        <a class="badge" href="#app-store"><img src="assets/favicon.svg" width="34" height="34" alt=""><span><small>Download on the</small> <strong>App Store</strong></span></a>
+        <p class="soon"><span class="soon__dot" aria-hidden="true"></span>Coming to the App Store</p>
+<!-- STAGED: App Store link (hero). On approval: delete the "Coming to the App Store" line
+     directly above, remove this comment's markers, and replace APPLE_ID with the numeric
+     Apple ID from App Store Connect. A plain text button, never a look-alike of Apple's badge;
+     if the badge is wanted, use the official artwork from Apple's marketing resources.
+        <a class="get" href="https://apps.apple.com/app/idAPPLE_ID">Download on the App Store</a>
+-->
         <a class="more" href="#offline">How offline maps work</a>
       </div>
     </div>
@@ -560,7 +602,7 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
                alt="Ridgeway on Apple Watch Ultra following the route on a dark topo map, with a turn in 210 m.">
         </div></div></div>
       </figure>
-      <p class="attrib">Map data © OpenStreetMap contributors · © OpenMapTiles · OpenFreeMap</p>
+      <p class="attrib"><span class="nw">Map data © OpenStreetMap contributors&nbsp;·</span> <span class="nw">© OpenMapTiles · OpenFreeMap</span></p>
     </div>
   </div>
 </section>
@@ -632,7 +674,7 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
     </div>
     <ul class="specs reveal">
       <li><h3>Next Aid</h3><p>Distance, climb, arrival time and margin, on its own page on Apple Watch.</p></li>
-      <li><h3>Cutoff alerts</h3><p>A tap on your wrist when your margin drops below 15 minutes, and again each time it shrinks by another 10.</p></li>
+      <li><h3>Cutoff alerts</h3><p>A tap on your wrist when your margin drops below the warning you choose, 15 minutes unless you change it, and again each time it shrinks by another 10.</p></li>
       <li><h3>Aid stops</h3><p>A rest timer starts as you reach an aid station, and stops as you leave.</p></li>
       <li><h3>Paste the list</h3><p>Copy the stops and cutoffs from the race website, and paste them onto the route.</p></li>
     </ul>
@@ -689,7 +731,7 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
         <figure class="tile__fig">
           <div class="phone">
             <div class="phone__body"><div class="phone__glass"><div class="phone__screen">
-              <img src="assets/shots/turn-alert.jpg" width="720" height="698" loading="lazy" decoding="async"
+              <img src="assets/shots/turn-alert.jpg" width="720" height="1036" loading="lazy" decoding="async"
                    alt="A turn alert on iPhone during a trail run: 60 m, Bear right, arriving 11:20 am.">
             </div></div></div>
           </div>
@@ -710,13 +752,30 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
           <h3>Back to Start</h3>
           <p>One tap from anywhere, and your recording carries on. Reverse Route turns the whole line around.</p>
         </div>
-        <svg viewBox="0 0 300 150" aria-hidden="true" focusable="false">
-          <defs><filter id="bts-glow" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="5"/></filter></defs>
-          <path d="M28 118 C 70 116, 84 74, 128 70 S 196 92, 226 52 S 262 18, 276 30" stroke="#409CFF" stroke-width="9" stroke-linecap="round" fill="none" opacity=".45" filter="url(#bts-glow)"/>
-          <path d="M28 118 C 70 116, 84 74, 128 70 S 196 92, 226 52 S 262 18, 276 30" stroke="#409CFF" stroke-width="3" stroke-linecap="round" fill="none"/>
-          <path d="M276 30 C 250 70, 200 120, 40 124" stroke="#F2F2EE" stroke-opacity=".7" stroke-width="2" stroke-dasharray="2 7" stroke-linecap="round" fill="none"/>
-          <circle cx="28" cy="118" r="8" fill="#FF4FB2" stroke="#07090D" stroke-width="3"/>
-          <circle cx="276" cy="30" r="8" fill="#409CFF" stroke="#F2F2EE" stroke-width="3"/>
+        <svg class="bts" viewBox="0 0 400 300" preserveAspectRatio="xMidYMax meet" fill="none" aria-hidden="true" focusable="false">
+          <defs>
+            <filter id="bts-glow" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="5"/></filter>
+            <linearGradient id="bts-fade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".4" stop-color="#fff"/></linearGradient>
+            <mask id="bts-mask"><rect width="400" height="300" fill="url(#bts-fade)"/></mask>
+          </defs>
+          <g mask="url(#bts-mask)" stroke="#AABEDC" stroke-opacity=".15" stroke-width="1">
+            <path d="M262 112c20-6 40 2 42 17s-16 24-37 22-31-9-31-20 9-15 26-19Z"/>
+            <path d="M252 92c33-10 70 0 76 27s-24 48-61 46-59-13-59-34 13-31 44-39Z"/>
+            <path d="M243 72c45-14 98-2 108 38s-34 73-87 71-87-17-87-48 19-48 66-61Z"/>
+            <path d="M233 51c57-17 124-4 138 50s-42 99-111 97-117-23-117-64 33-67 90-83Z" stroke-opacity=".26"/>
+            <path d="M222 30c68-21 150-5 166 62s-50 124-134 122-142-28-142-80 40-84 110-104Z"/>
+            <path d="M-10 226c62-10 112 8 154 32s96 30 152 18 94-16 114-10"/>
+            <path d="M-10 258c54-6 98 12 138 30"/>
+            <path d="M118 0c-32 30-44 64-32 100s-4 70-48 92-48 26-48 26"/>
+            <path d="M74 0c-30 34-40 70-30 108"/>
+          </g>
+          <path d="M66 262c24-8 36-30 54-40s30 2 46-10 16-44 36-56 40 4 58-8 24-38 46-50 34-2 50-22" stroke="#409CFF" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" opacity=".42" filter="url(#bts-glow)"/>
+          <path d="M66 262c24-8 36-30 54-40s30 2 46-10 16-44 36-56 40 4 58-8 24-38 46-50 34-2 50-22" stroke="#409CFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M356 76C318 140 250 200 166 236s-76 28-100 26" stroke="#F2F2EE" stroke-opacity=".78" stroke-width="2" stroke-dasharray="1.5 7" stroke-linecap="round"/>
+          <path d="M307.7 147.9L296.9 149.6 299 138.8M225.4 212.5L214.4 211.6 219 201.6" stroke="#F2F2EE" stroke-opacity=".85" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="66" cy="262" r="8" fill="#FF4FB2" stroke="#07090D" stroke-width="3"/>
+          <circle cx="356" cy="76" r="13" fill="#409CFF" fill-opacity=".2"/>
+          <circle cx="356" cy="76" r="7" fill="#409CFF" stroke="#F2F2EE" stroke-width="3"/>
         </svg>
       </article>
     </div>
@@ -791,38 +850,38 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
       <h2 id="watch-title">A watch that stands on its own.</h2>
       <p class="lede">Ridgeway opens to a full-screen topo map. Follow a route, record, reverse it or head Back to Start with your iPhone left at home, and download maps on the watch itself over Wi-Fi or cellular.</p>
     </div>
-    <ul class="watches">
+    <ul class="watches" tabindex="0" aria-label="Apple Watch pages">
       <li class="reveal">
         <div class="watch"><div class="watch__case"><div class="watch__glass"><div class="watch__screen">
-          <img src="assets/watch/map.jpg" width="400" height="487" loading="lazy" decoding="async"
+          <img src="assets/watch/map.jpg" width="400" height="487" decoding="async"
                alt="The map page: the route, your position and heading, and the next turn in 210 m.">
         </div></div></div></div>
         <h3>Map</h3><p>Heading-up, with the next turn. Turn the Digital Crown to zoom.</p>
       </li>
       <li class="reveal d1">
         <div class="watch"><div class="watch__case"><div class="watch__glass"><div class="watch__screen">
-          <img src="assets/watch/run.png" width="400" height="487" loading="lazy" decoding="async"
+          <img src="assets/watch/run.png" width="400" height="487" decoding="async"
                alt="The run page: time, distance, pace, heart rate, a Lap button and the battery forecast.">
         </div></div></div></div>
         <h3>Run</h3><p>Time, pace and heart rate, and the battery you’ll finish with.</p>
       </li>
       <li class="reveal d2">
         <div class="watch"><div class="watch__case"><div class="watch__glass"><div class="watch__screen">
-          <img src="assets/watch/next-aid.png" width="400" height="487" loading="lazy" decoding="async"
+          <img src="assets/watch/next-aid.png" width="400" height="487" decoding="async"
                alt="The Next Aid page: distance, climb, arrival time and the margin before the cutoff.">
         </div></div></div></div>
         <h3>Next Aid <span class="plus"><span class="vh">Part of Ridgeway </span>Plus</span></h3><p>The next aid station, and your time in hand.</p>
       </li>
       <li class="reveal d3">
         <div class="watch"><div class="watch__case"><div class="watch__glass"><div class="watch__screen">
-          <img src="assets/watch/route-compass.png" width="400" height="487" loading="lazy" decoding="async"
+          <img src="assets/watch/route-compass.png" width="400" height="487" decoding="async"
                alt="The route compass: distance from the route and the next turn.">
         </div></div></div></div>
         <h3>Route Compass</h3><p>Where the line is, and where it goes next.</p>
       </li>
       <li class="reveal d3">
         <div class="watch"><div class="watch__case"><div class="watch__glass"><div class="watch__screen">
-          <img src="assets/watch/off-route.png" width="400" height="487" loading="lazy" decoding="async"
+          <img src="assets/watch/off-route.png" width="400" height="487" decoding="async"
                alt="Off Route: the distance and direction back to the route.">
         </div></div></div></div>
         <h3>Off Route</h3><p>The distance and the direction back, in one glance.</p>
@@ -885,12 +944,23 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
       </li>
       <li class="reveal d2">
         <div class="phone"><div class="phone__body"><div class="phone__glass"><div class="phone__screen">
-          <img src="assets/shots/style-hiking-pro.jpg" width="480" height="1043" loading="lazy" decoding="async"
-               alt="The route in Hiking Pro: a paper topo map with dense contours, rock and paths, and the route in dark magenta.">
+          <img src="assets/shots/style-minimal-light.jpg" width="480" height="1043" loading="lazy" decoding="async"
+               alt="The route in Minimal Light: a quiet white map with faint contours, paths and water, and no labels.">
         </div></div></div></div>
-        <h3>Hiking Pro <span class="plus"><span class="vh">Part of Ridgeway </span>Plus</span></h3>
+        <h3>Minimal Light</h3>
       </li>
       <li class="reveal d3">
+        <div class="styles__dev">
+          <div class="phone"><div class="phone__body"><div class="phone__glass"><div class="phone__screen">
+            <img src="assets/shots/style-hiking-pro.jpg" width="480" height="1043" loading="lazy" decoding="async"
+                 alt="The route in Hiking Pro: a paper topo map with dense contours, rock and paths, and the route in dark magenta.">
+          </div></div></div></div>
+          <img class="loupe" src="assets/shots/style-hiking-pro-detail.jpg" width="360" height="360" loading="lazy" decoding="async"
+               alt="Hiking Pro at full size around Helvellyn and Red Tarn: 10 m contours with their heights, crags, path types and summit heights.">
+        </div>
+        <h3>Hiking Pro <span class="plus"><span class="vh">Part of Ridgeway </span>Plus</span></h3>
+      </li>
+      <li class="reveal d4">
         <div class="phone"><div class="phone__body"><div class="phone__glass"><div class="phone__screen">
           <img src="assets/shots/style-tactical.jpg" width="480" height="1043" loading="lazy" decoding="async"
                alt="The route in Tactical: the map and the app drawn in red on black.">
@@ -919,7 +989,7 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
     </div>
     <ul class="plus-cards">
       <li class="reveal">
-        <div class="peek" aria-hidden="true"><img src="assets/shots/you.jpg" width="720" height="1564" loading="lazy" decoding="async" alt="" style="margin-top:-23.5%"></div>
+        <div class="peek" aria-hidden="true"><img src="assets/shots/you.jpg" width="720" height="1564" loading="lazy" decoding="async" alt="" style="margin-top:-28.6%"></div>
         <h3>Your history</h3>
         <p>Your Apple Health history, all-time totals and highlights, and the world map in the You tab.</p>
       </li>
@@ -951,12 +1021,14 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
   </div>
 </section>
 
-<section class="close" id="app-store" aria-labelledby="close-title">
+<section class="close" id="get" aria-labelledby="close-title">
   <div class="wrap reveal">
     <img class="close__icon" src="assets/icon-256.png" width="256" height="256" loading="lazy" decoding="async" alt="">
     <h2 id="close-title">Plan tonight. <span>Leave your phone in the pack.</span></h2>
-    <!-- TODO(App Store): replace href="#app-store" with the listing URL, as in the hero. -->
-    <a class="badge" href="#app-store"><img src="assets/favicon.svg" width="34" height="34" alt=""><span><small>Download on the</small> <strong>App Store</strong></span></a>
+    <p class="soon"><span class="soon__dot" aria-hidden="true"></span>Coming to the App Store</p>
+<!-- STAGED: App Store link (closing section). On approval: as in the hero.
+    <a class="get" href="https://apps.apple.com/app/idAPPLE_ID">Download on the App Store</a>
+-->
     <p class="close__fine">For iPhone with iOS 26 or later, and Apple Watch with watchOS 26 or later.</p>
   </div>
   <div class="ridge reveal" aria-hidden="true">

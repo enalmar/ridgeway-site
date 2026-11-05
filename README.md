@@ -24,12 +24,15 @@ Store Connect, and the contact in the map-tile User-Agent), so those two address
 
 ## Before it goes live
 
-**The App Store link.** There is no listing yet, so the three download links — Download in the
-bar, the badge in the hero and the badge in the closing section — point at `#app-store`, each
-marked `TODO(App Store)` in `index.html`. When the listing is live, put
-`https://apps.apple.com/app/id<APPLE_ID>` in all three, and add `downloadUrl` to the JSON-LD in the
-head (marked the same way). The badge is text styled as a badge, not Apple's artwork; if the
-official badge is wanted, it comes from Apple's marketing resources, with their rules.
+**The App Store link.** The site goes live before the listing exists (App Store Connect needs the
+privacy and support addresses), so nothing on it pretends to download. The hero and the closing
+section show a plain "Coming to the App Store" pill that is not a link, and the bar has no download
+button. The live markup is already in `index.html`, in three comments marked `STAGED`: the bar's
+Download, and a "Download on the App Store" text button in the hero and in the closing section. At
+launch, delete the two pills, remove those comments' markers, replace `APPLE_ID` with the numeric
+Apple ID from App Store Connect, and add `downloadUrl` to the JSON-LD in the head (marked the same
+way). The button is plain text; never a home-made copy of Apple's badge. If the official badge is
+wanted, it comes from Apple's marketing resources, with their rules (BRAND §3.4).
 
 No price appears anywhere. Ridgeway Plus is priced by the App Store, and the page only says it is
 an optional one-time purchase, shared through Family Sharing.
@@ -65,10 +68,12 @@ Its own, not the other app sites': a night survey of the hills.
 Real captures of the app, not mock-ups: a Debug build of `feature/trail-run` at `5661f21`, on two
 simulators made for the job, "Site iPhone 17 Pro Max" (iOS 26.5) and "Site Apple Watch Ultra 3
 (49mm)" (watchOS 26.5), paired. British English, dark appearance (light for the Standard Light
-style), Ridgeway Plus on, Health history from the app's built-in sample data, location at
+and Minimal Light styles), Ridgeway Plus on, Health history from the app's built-in sample data, location at
 Glenridding, and the iPhone status bar set to 9:41. Every map finished loading before its capture.
 Race Day has three stops added to the sample route "Helvellyn via Striding Edge": Hole-in-the-Wall,
-Helvellyn and Red Tarn, each with a cutoff.
+Helvellyn and Red Tarn, each with a cutoff. Every map-style capture is the same view: the sample
+route opened with Library › the route › Show on Map, then the style chosen in Map Style (Minimal
+Light was added later from the same build and simulator, the same way).
 
 Things that are true of them, so nobody is surprised:
 
@@ -89,8 +94,9 @@ pip3 install pillow           # once
 python3 tools/shots.py ~/Dev/ridgeway-site-assets-raw
 ```
 
-That crops where a tile shows only part of a screen (the turn banner, the climbs, the download
-card), scales iPhone captures to 720 px wide (480 for the map-style thumbnails) and writes
+That crops where a tile shows only part of a screen (the turn banner and the route under it, the
+climbs, the download card, and the Hiking Pro detail around Helvellyn that sits in a loupe over
+its thumbnail, so the style's 10 m contours and crags show at full size), scales iPhone captures to 720 px wide (480 for the map-style thumbnails) and writes
 progressive JPEG with optimised tables, quality 84. That is about 40% smaller than the
 `sips -s format jpeg` route the other sites use, with no difference visible on the map text at
 2x. Watch captures stay PNG, apart from the map page.
@@ -110,7 +116,8 @@ and the terrain tiles in a sibling `dem-tiles/`, so run them from a scratch fold
 
 ```bash
 mkdir -p /tmp/ridgeway-art/art && cp -R tools/art /tmp/ridgeway-art/art/tools
-sh /tmp/ridgeway-art/art/tools/build.sh      # python3, swift, curl and Google Chrome
+APPICON=<app repo>/App/iOS/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png \
+  sh /tmp/ridgeway-art/art/tools/build.sh    # python3, swift, curl and Google Chrome
 ```
 
 `build.sh` downloads 20 Terrarium elevation tiles around Helvellyn (zoom 13, the same public
