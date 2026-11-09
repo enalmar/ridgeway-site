@@ -123,7 +123,7 @@ def unmark_watch_map(im):
     return im
 
 
-UNMARK = {"trail-run-dashboard": unmark_dashboard, "watch-session-map.png": unmark_watch_map}
+UNMARK = {"trail-run-dashboard": unmark_dashboard}   # the watch map page capture (Route Blue, 9 Nov) has no "Demo" capsule
 
 
 def save_jpeg(im, path, quality):

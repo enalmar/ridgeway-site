@@ -41,7 +41,7 @@
    behind everything, a faint Ridgeway Blue light where the hero is, and the app's own route
    line drawing itself on load. Everything else is the app, in real captures, in CSS devices.
    Colours are BRAND.md's: Night ground, Paper ink, Ridgeway Blue #409CFF (dark) as the one
-   accent, the route's magenta only where the app uses it. Never a blue field (BRAND §4.4). */
+   accent, the route's Route Blue (#42CFFF on dark) only where the app uses it. Never a blue field (BRAND §4.4). */
 :root {
   color-scheme: dark;
   --ground: #07090D;
@@ -54,7 +54,7 @@
   --blue: #409CFF;
   --blue-hi: #7CBCFF;
   --blue-fill: #1E6AE8;
-  --magenta: #FF4FB2;
+  --route: #42CFFF;
   --green: #30D158;
 
   --sans: -apple-system, BlinkMacSystemFont, "Inter", "Helvetica Neue", "Segoe UI", Roboto, sans-serif;
@@ -583,7 +583,7 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
 .rw-glow{stroke:var(--rw-route,#409CFF);stroke-width:16;stroke-linecap:round;stroke-linejoin:round;opacity:var(--rw-glow,.35)}
 .rw-line{stroke:var(--rw-route,#409CFF);stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
 .rw-draw{stroke-dasharray:1;stroke-dashoffset:0}
-.rw-start{fill:var(--rw-start,#FF4FB2);stroke:var(--rw-ground,#07090E);stroke-width:4}
+.rw-start{fill:var(--rw-start,#42CFFF);stroke:var(--rw-ground,#07090E);stroke-width:4}
 .rw-top{fill:var(--rw-ink,#F2F2EE)}
 @media (prefers-reduced-motion:no-preference){
 .rw-draw{stroke-dashoffset:1;animation:rw-draw var(--rw-dur,3.2s) cubic-bezier(.45,.05,.2,1) var(--rw-delay,.5s) forwards}
@@ -603,7 +603,7 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
       <figure class="phone">
         <div class="phone__body"><div class="phone__glass"><div class="phone__screen">
           <img src="assets/shots/map-standard-dark.jpg" width="720" height="1564" fetchpriority="high"
-               alt="Ridgeway’s map on iPhone, Standard Dark: the fells around Helvellyn, with the route Helvellyn via Striding Edge in magenta, 12.1 km, ↑ 816 m, 3 h 30 min.">
+               alt="Ridgeway’s map on iPhone, Standard Dark: the fells around Helvellyn, with the route Helvellyn via Striding Edge in blue, 12.1 km, ↑ 816 m, 3 h 30 min.">
         </div></div></div>
       </figure>
       <figure class="watch">
@@ -706,7 +706,7 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
           <div class="phone">
             <div class="phone__body"><div class="phone__glass"><div class="phone__screen">
               <img src="assets/shots/off-route.jpg" width="720" height="1564" loading="lazy" decoding="async"
-                   alt="Off Route on iPhone: a red banner reads Off Route · 90 m, Proceed to Route, with a dotted line from your position back to the magenta route.">
+                   alt="Off Route on iPhone: a red banner reads Off Route · 60 m, Proceed to Route, with a dotted line from your position back to the blue route.">
             </div></div></div>
           </div>
         </figure>
@@ -783,7 +783,7 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
           <path d="M66 262c24-8 36-30 54-40s30 2 46-10 16-44 36-56 40 4 58-8 24-38 46-50 34-2 50-22" stroke="#409CFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M356 76C318 140 250 200 166 236s-76 28-100 26" stroke="#F2F2EE" stroke-opacity=".78" stroke-width="2" stroke-dasharray="1.5 7" stroke-linecap="round"/>
           <path d="M307.7 147.9L296.9 149.6 299 138.8M225.4 212.5L214.4 211.6 219 201.6" stroke="#F2F2EE" stroke-opacity=".85" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="66" cy="262" r="8" fill="#FF4FB2" stroke="#07090D" stroke-width="3"/>
+          <circle cx="66" cy="262" r="8" fill="#42CFFF" stroke="#07090D" stroke-width="3"/>
           <circle cx="356" cy="76" r="13" fill="#409CFF" fill-opacity=".2"/>
           <circle cx="356" cy="76" r="7" fill="#409CFF" stroke="#F2F2EE" stroke-width="3"/>
         </svg>
@@ -833,7 +833,7 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
       <figure class="phone">
         <div class="phone__body"><div class="phone__glass"><div class="phone__screen">
           <img src="assets/shots/planner.jpg" width="720" height="1564" loading="lazy" decoding="async"
-               alt="The planner on iPhone: seven points joined by straight magenta lines from Glenridding over Helvellyn to Seat Sandal, with 8.0 km, 1,300 m of ascent and a run time of 2 h 5 min.">
+               alt="The planner on iPhone: points joined by straight blue lines from above Glenridding, past Helvellyn to Grisedale, with 6.5 km, 870 m of ascent and an estimated 3 h 20 min.">
         </div></div></div>
       </figure>
       <figure class="phone">
@@ -948,7 +948,7 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
       <li class="reveal d1">
         <div class="phone"><div class="phone__body"><div class="phone__glass"><div class="phone__screen">
           <img src="assets/shots/style-standard-light.jpg" width="480" height="1043" loading="lazy" decoding="async"
-               alt="The route in Standard Light: a pale topo map with the route in magenta.">
+               alt="The route in Standard Light: a pale topo map with the route in blue.">
         </div></div></div></div>
         <h3>Standard Light</h3>
       </li>
@@ -963,7 +963,7 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
         <div class="styles__dev">
           <div class="phone"><div class="phone__body"><div class="phone__glass"><div class="phone__screen">
             <img src="assets/shots/style-hiking-pro.jpg" width="480" height="1043" loading="lazy" decoding="async"
-                 alt="The route in Hiking Pro: a paper topo map with dense contours, rock and paths, and the route in dark magenta.">
+                 alt="The route in Hiking Pro: a paper topo map with dense contours, rock and paths, and the route in deep blue.">
           </div></div></div></div>
           <img class="loupe" src="assets/shots/style-hiking-pro-detail.jpg" width="360" height="360" loading="lazy" decoding="async"
                alt="Hiking Pro at full size around Helvellyn and Red Tarn: 10 m contours with their heights, crags, path types and summit heights.">
