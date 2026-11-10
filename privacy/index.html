@@ -93,6 +93,7 @@
         <tr role="row"><td role="cell" data-label="What">Terrain (elevation) tiles</td><td role="cell" data-label="Who serves it">Terrain Tiles on Amazon Web Services (s3.amazonaws.com)</td><td role="cell" data-label="What they can see">the same, for terrain tiles</td></tr>
         <tr role="row"><td role="cell" data-label="What">The current OpenFreeMap map version</td><td role="cell" data-label="Who serves it">OpenFreeMap</td><td role="cell" data-label="What they can see">your IP address</td></tr>
         <tr role="row"><td role="cell" data-label="What">The world map in the You tab (Ridgeway Plus)</td><td role="cell" data-label="Who serves it">Apple MapKit</td><td role="cell" data-label="What they can see">what Apple’s Maps privacy policy describes</td></tr>
+        <tr role="row"><td role="cell" data-label="What">iCloud Sync (Ridgeway Plus, when you turn it on)</td><td role="cell" data-label="Who serves it">Apple iCloud, in your own private database</td><td role="cell" data-label="What they can see">what Apple’s iCloud privacy policy describes; only your Apple Account can read the routes, Race Day plans, activities and waypoints it keeps, and the developer never sees them</td></tr>
         <tr role="row"><td role="cell" data-label="What">The Ridgeway Plus purchase</td><td role="cell" data-label="Who serves it">the App Store</td><td role="cell" data-label="What they can see">what Apple’s App Store privacy policy describes; Ridgeway only learns whether Plus is unlocked</td></tr>
       </tbody>
     </table>
@@ -100,6 +101,8 @@
   <p>These services have their own privacy policies. Ridgeway sends them nothing about you beyond what any app or website sends when it asks for a file.</p>
   <p><strong>Use Only Offline Maps</strong> (Settings › Map) stops every map and terrain request; the app then uses only the maps on your device.</p>
   <p>There is <strong>no routing server</strong> in version 1: the planner draws straight lines between your points on the device, and routes that follow paths come from GPX files you import.</p>
+
+  <p><strong>Plan with your AI (Ridgeway Plus).</strong> Ridgeway has no AI of its own and sends nothing to one. If you copy your routes into an AI, or let an AI edit <code>ridgeway.txt</code> in iCloud Drive › Ridgeway, that AI’s own privacy terms apply to what you give it. Nothing changes in Ridgeway until you review and apply it.</p>
 
   <h2 id="notifications">5. Notifications</h2>
   <p>If you allow notifications, Ridgeway shows navigation alerts (off route, turns, arrival, cutoffs and a low battery) on the Lock Screen during an activity. They are created on your iPhone; Ridgeway does not use push notifications or any notification server.</p>
