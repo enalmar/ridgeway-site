@@ -216,6 +216,46 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
 .attrib { font-size: 12px; line-height: 1.4; color: var(--ink-3); letter-spacing: .005em; }
 .nw { white-space: nowrap; }
 
+/* ---- Everywhere: iPad, iPhone Duo, iPhone and Apple Watch with the same route (iCloud Sync) ----
+   The lineup is one proportional stage: every device is a percentage of its width, so the group
+   scales as one picture. iPad and the unfolded Duo are drawn like the iPhone: CSS around captures. */
+.everywhere__stage { position: relative; width: min(100%, 1060px); margin: clamp(40px, 5vw, 64px) auto 0;
+                     aspect-ratio: 1060 / 720; isolation: isolate; }
+.everywhere__stage::before { content: ""; position: absolute; z-index: -1; inset: 8% 6% -4%;
+  background: radial-gradient(closest-side, rgba(64, 156, 255, .16), transparent 70%); }
+.everywhere__stage figure { position: absolute; bottom: 0; margin: 0; container-type: inline-size; }
+.everywhere__stage .tablet { left: 0; width: 46%; bottom: 2%; }
+.everywhere__stage .fold   { left: 37%; width: 30%; z-index: 2; }
+.everywhere__stage .phone  { left: 62%; width: 20%; z-index: 3; --w: 20%; }
+.everywhere__stage .watch  { left: 80%; width: 14.5%; z-index: 4; bottom: 3%; --w: 14.5%; }
+.tablet__body, .fold__body { position: relative; padding: .5cqw;
+  background: linear-gradient(155deg, #7a808b 0%, #3a3e46 18%, #22252b 50%, #383c44 84%, #6c727d 100%);
+  box-shadow: 0 0 0 .25cqw rgba(0, 0, 0, .7), 0 3cqw 7cqw -1cqw rgba(0, 0, 0, .5), 0 14cqw 26cqw -6cqw rgba(0, 0, 0, .9); }
+.tablet__body { border-radius: 5.6cqw; }
+.tablet__glass { padding: 3.4cqw; border-radius: 5.2cqw; background: #030304; box-shadow: inset 0 0 0 .25cqw #121317; }
+.tablet__screen { overflow: hidden; border-radius: 2.4cqw; aspect-ratio: 2064 / 2752; background: #000; }
+.fold__body { border-radius: 9cqw; }
+.fold__glass { padding: 2.6cqw; border-radius: 8.6cqw; background: #030304; box-shadow: inset 0 0 0 .3cqw #121317; }
+.fold__screen { position: relative; overflow: hidden; border-radius: 6.4cqw; aspect-ratio: 1398 / 2034; background: #000; }
+.fold__screen::after { /* the hinge, barely there */ content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 1.4cqw;
+  translate: -50% 0; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .05) 45%, rgba(0, 0, 0, .18) 55%, transparent); }
+.tablet__screen img, .fold__screen img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.everywhere__stage .phone .phone__body { box-shadow: 0 0 0 .3cqw rgba(0, 0, 0, .7), 0 3cqw 7cqw -1cqw rgba(0, 0, 0, .55), 0 10cqw 22cqw -6cqw rgba(0, 0, 0, .9); }
+.everywhere__sync { position: absolute; z-index: 5; left: 50%; top: 0; translate: -50% 0; display: inline-flex; align-items: center; gap: 10px;
+  padding: 10px 18px; border-radius: 999px; font-size: 14.5px; font-weight: 600; color: var(--ink);
+  background: rgba(20, 24, 34, .72); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.everywhere__sync svg { width: 18px; height: 18px; flex: none; color: var(--blue); }
+.everywhere .specs { grid-template-columns: repeat(3, 1fr); max-width: 980px; margin-inline: auto; }
+@media (max-width: 760px) {
+  .everywhere__stage { aspect-ratio: 1060 / 860; }
+  .everywhere__stage .tablet { width: 58%; bottom: 14%; }
+  .everywhere__stage .fold { left: 30%; width: 38%; }
+  .everywhere__stage .phone { left: 60%; width: 25%; --w: 25%; }
+  .everywhere__stage .watch { left: 79%; width: 19%; --w: 19%; }
+  .everywhere__sync { font-size: 13px; padding: 8px 14px; }
+  .everywhere .specs { grid-template-columns: 1fr; }
+}
+
 /* ---- Hero --------------------------------------------------------------------------------- */
 .hero { position: relative; padding-block: clamp(28px, 6vh, 72px) clamp(64px, 10vh, 120px); overflow-x: clip; }
 .hero__grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px);
@@ -982,6 +1022,49 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
   </div>
 </section>
 
+<section class="section everywhere" id="everywhere" aria-labelledby="everywhere-title">
+  <div class="wrap">
+    <div class="center reveal">
+      <p class="eyebrow">iPhone, iPad and Apple Watch</p>
+      <h2 id="everywhere-title">Plan anywhere. Follow it everywhere.</h2>
+      <p class="lede">Plan on the big screen of your iPad, check the climbs on an unfolded iPhone, and follow the route from your wrist. With iCloud Sync, your routes, Race Day plans and activities are the same on every device.</p>
+    </div>
+    <div class="everywhere__stage reveal d1">
+      <p class="everywhere__sync"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19H8a5 5 0 1 1 .9-9.92A6 6 0 0 1 20 11.5a3.75 3.75 0 0 1-2.5 7.5Z"/><path d="m10 14 2 2 3.5-4"/></svg>In sync with iCloud</p>
+      <figure class="tablet">
+        <div class="tablet__body"><div class="tablet__glass"><div class="tablet__screen">
+          <img src="assets/shots/ipad-map.jpg" width="1000" height="1333" loading="lazy" decoding="async"
+               alt="Ridgeway on iPad: the Helvellyn via Striding Edge route in blue on the dark topo map, with the tab bar at the top.">
+        </div></div></div>
+      </figure>
+      <figure class="fold">
+        <div class="fold__body"><div class="fold__glass"><div class="fold__screen">
+          <img src="assets/shots/duo-map.jpg" width="560" height="815" loading="lazy" decoding="async"
+               alt="The same route on an unfolded iPhone Duo: 12.1 km, 816 m of ascent, 3 h 30 min.">
+        </div></div></div>
+      </figure>
+      <figure class="phone">
+        <div class="phone__body"><div class="phone__glass"><div class="phone__screen">
+          <img src="assets/shots/map-standard-dark.jpg" width="720" height="1564" loading="lazy" decoding="async"
+               alt="The same route on iPhone, on the Standard Dark map.">
+        </div></div></div>
+      </figure>
+      <figure class="watch">
+        <div class="watch__case"><div class="watch__glass"><div class="watch__screen">
+          <img src="assets/watch/map.jpg" width="400" height="487" loading="lazy" decoding="async"
+               alt="Apple Watch following the route, with the next turn in 10 m.">
+        </div></div></div>
+      </figure>
+    </div>
+    <p class="attrib center" style="margin-top:14px">Map data © OpenStreetMap contributors · © OpenMapTiles · OpenFreeMap</p>
+    <ul class="specs reveal">
+      <li><h3>iCloud Sync</h3><p>Routes, Race Day plans, activities and waypoints in your own private iCloud, on your iPhone and iPad. Ridgeway never sees them.</p></li>
+      <li><h3>Plan with your AI</h3><p>Ask the AI you already use to set up a race or tidy your routes. Ridgeway shows every change before it applies.</p></li>
+      <li><h3>Built for each screen</h3><p>A sidebar and readable columns on iPad, the full width of an unfolded iPhone Duo, and a map on your wrist.</p></li>
+    </ul>
+  </div>
+</section>
+
 <section class="section privacy" id="privacy" aria-labelledby="privacy-title">
   <div class="wrap center reveal">
     <h2 id="privacy-title"><span>No account.</span> <span>No ads.</span> <span>No tracking.</span></h2>
@@ -995,7 +1078,7 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
     <div class="center reveal">
       <p class="eyebrow">Ridgeway Plus</p>
       <h2 id="plus-title">One purchase, shared with your family.</h2>
-      <p class="lede">Everything that gets you there and back is free, on iPhone and Apple Watch. Ridgeway Plus is an optional one-time purchase, shared through Family Sharing, that adds three things.</p>
+      <p class="lede">Everything that gets you there and back is free, on iPhone, iPad and Apple Watch. Ridgeway Plus is an optional one-time purchase, shared through Family Sharing. It adds these three, plus iCloud Sync and Plan with your AI.</p>
     </div>
     <ul class="plus-cards">
       <li class="reveal">
