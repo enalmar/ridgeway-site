@@ -4,36 +4,36 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Ridgeway: offline maps and navigation for trail runs and hikes</title>
-<meta name="description" content="Offline topo maps and navigation for trail runners and hikers, on iPhone and Apple Watch. Splits, fuel timers, climbs, Off Route and turn alerts, Race Day cutoffs and the way back, with no signal and no account.">
+<meta name="description" content="Offline topo maps and navigation for trail runners and hikers, on iPhone, iPad and Apple Watch. Splits, fuel timers, climbs, Off Route and turn alerts, Race Day cutoffs and the way back, with no signal and no account.">
 <link rel="canonical" href="https://ridgeway.enalmar.uk/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Ridgeway">
 <meta property="og:locale" content="en_GB">
 <meta property="og:url" content="https://ridgeway.enalmar.uk/">
 <meta property="og:title" content="Ridgeway: trail runs and mountain days, navigated offline">
-<meta property="og:description" content="Offline topo maps and navigation for trail runners and hikers, on iPhone and Apple Watch. No account, and no signal needed.">
+<meta property="og:description" content="Offline topo maps and navigation for trail runners and hikers, on iPhone, iPad and Apple Watch. No account, and no signal needed.">
 <meta property="og:image" content="https://ridgeway.enalmar.uk/assets/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="The Ridgeway icon and name beside a glowing route drawn over contour lines.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Ridgeway: trail runs and mountain days, navigated offline">
-<meta name="twitter:description" content="Offline topo maps and navigation for trail runners and hikers, on iPhone and Apple Watch.">
+<meta name="twitter:description" content="Offline topo maps and navigation for trail runners and hikers, on iPhone, iPad and Apple Watch.">
 <meta name="twitter:image" content="https://ridgeway.enalmar.uk/assets/og.jpg">
 <meta name="twitter:image:alt" content="The Ridgeway icon and name beside a glowing route drawn over contour lines.">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#07090D">
+<meta name="apple-itunes-app" content="app-id=6831210304">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="assets/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-<!-- STAGED: at launch, add "downloadUrl":"https://apps.apple.com/app/idAPPLE_ID" to the JSON-LD below. -->
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"SoftwareApplication",
  "name":"Ridgeway","alternateName":"Ridgeway: Hike & Trail Run",
  "operatingSystem":"iOS 26.0 or later; watchOS 26.0 or later",
  "applicationCategory":"TravelApplication","applicationSubCategory":"Navigation",
- "description":"Offline topo maps and navigation for trail runners and hikers, on iPhone and Apple Watch.",
- "url":"https://ridgeway.enalmar.uk/","image":"https://ridgeway.enalmar.uk/assets/icon-256.png"}
+ "description":"Offline topo maps and navigation for trail runners and hikers, on iPhone, iPad and Apple Watch.",
+ "url":"https://ridgeway.enalmar.uk/","downloadUrl":"https://apps.apple.com/app/id6831210304","offers":{"@type":"Offer","price":"0","priceCurrency":"GBP"},"image":"https://ridgeway.enalmar.uk/assets/icon-256.png"}
 </script>
 <style>
 /* ---- Ridgeway, the website ----------------------------------------------------------------
@@ -269,18 +269,8 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
 .more { font-weight: 500; font-size: 17px; white-space: nowrap; }
 .more::after { content: "\00A0\203A"; } /* the chevron stays with the last word */
 
-/* Before launch: a quiet status pill, not a link. At launch: .get, a plain text button (never a
-   copy of Apple's badge; the official badge, if wanted, comes from Apple's marketing resources). */
-/* The pre-launch line is a planned leg on the map: a dashed route hairline that ends at a waypoint
-   ring, not yet walked. */
-.soon {
-  display: inline-flex; align-items: center; gap: 13px; min-height: 48px;
-  color: var(--ink); font-size: 15.5px; font-weight: 600; letter-spacing: -.005em; white-space: nowrap;
-}
-.soon__dot { position: relative; flex: none; width: 38px; height: 12px;
-             background: repeating-linear-gradient(90deg, var(--blue) 0 6px, transparent 6px 10px) left center / 26px 2px no-repeat; }
-.soon__dot::after { content: ""; position: absolute; right: 0; top: 0; width: 12px; height: 12px; box-sizing: border-box;
-                    border-radius: 50%; border: 2px solid var(--blue); box-shadow: 0 0 10px rgba(64, 156, 255, .55); }
+/* .get: a plain text button, never a copy of Apple's badge (the official badge, if wanted, comes from
+   Apple's marketing resources). */
 .get {
   display: inline-flex; align-items: center; height: 50px; padding: 0 24px; border-radius: 999px;
   background: var(--blue-fill); color: #fff; font-size: 16px; font-weight: 600; letter-spacing: -.005em;
@@ -543,7 +533,7 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
                box-shadow: 0 0 0 1px rgba(255, 255, 255, .08), 0 24px 60px -16px rgba(64, 156, 255, .45); }
 .close h2 { font-size: clamp(36px, 5.4vw, 76px); line-height: 1.03; letter-spacing: -.036em; font-weight: 700; }
 .close h2 span { display: block; color: var(--ink-2); }
-.close .soon, .close .get { margin-top: 40px; }
+.close .get { margin-top: 40px; }
 .close__fine { margin-top: 22px; font-size: 14px; color: var(--ink-3); }
 .ridge { position: relative; margin-top: clamp(64px, 9vw, 120px); height: clamp(120px, 16vw, 220px); --rw-dur: 3.6s; --rw-delay: .2s; }
 .ridge svg { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -587,11 +577,7 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
       <a href="#watch">Apple Watch</a>
       <a href="#plus">Ridgeway Plus</a>
     </nav>
-<!-- STAGED: App Store link (bar). No listing yet, so the bar has no download button.
-     On approval: remove this comment's markers and replace APPLE_ID with the numeric
-     Apple ID from App Store Connect (the same ID in all three staged links).
-    <a class="bar__get" href="https://apps.apple.com/app/idAPPLE_ID">Download</a>
--->
+    <a class="bar__get" href="https://apps.apple.com/app/id6831210304">Download</a>
   </div>
 </header>
 
@@ -600,17 +586,11 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
 <section class="hero" aria-labelledby="hero-title">
   <div class="wrap hero__grid">
     <div class="hero__copy">
-      <p class="hero__kicker"><b>Ridgeway</b> for iPhone and Apple Watch</p>
+      <p class="hero__kicker"><b>Ridgeway</b> for iPhone, iPad and Apple Watch</p>
       <h1 id="hero-title">Trail runs and mountain days, <span>navigated offline.</span></h1>
       <p class="hero__lede">Topo maps that live on your iPhone and Apple Watch, with turn alerts on your wrist, every climb counted and the way back, all without a signal. No account, and navigation is never locked.</p>
       <div class="hero__actions">
-        <p class="soon"><span class="soon__dot" aria-hidden="true"></span>Coming to the App Store</p>
-<!-- STAGED: App Store link (hero). On approval: delete the "Coming to the App Store" line
-     directly above, remove this comment's markers, and replace APPLE_ID with the numeric
-     Apple ID from App Store Connect. A plain text button, never a look-alike of Apple's badge;
-     if the badge is wanted, use the official artwork from Apple's marketing resources.
-        <a class="get" href="https://apps.apple.com/app/idAPPLE_ID">Download on the App Store</a>
--->
+        <a class="get" href="https://apps.apple.com/app/id6831210304">Download on the App Store</a>
         <a class="more" href="#offline">How offline maps work</a>
       </div>
     </div>
@@ -1068,7 +1048,7 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
 <section class="section privacy" id="privacy" aria-labelledby="privacy-title">
   <div class="wrap center reveal">
     <h2 id="privacy-title"><span>No account.</span> <span>No ads.</span> <span>No tracking.</span></h2>
-    <p class="lede">Your routes and activities stay on your iPhone and Apple Watch. There is no Ridgeway server, and the developer collects no data. Ridgeway goes online for map tiles, and Use Only Offline Maps turns that off.</p>
+    <p class="lede">Your routes and activities stay on your devices, and with iCloud Sync in your own iCloud. There is no Ridgeway server, and the developer collects no data. Ridgeway goes online for map tiles, and Use Only Offline Maps turns that off.</p>
     <a class="more" href="privacy/#network">Every request it makes, in the privacy policy</a>
   </div>
 </section>
@@ -1119,11 +1099,8 @@ a:hover { text-decoration: underline; text-underline-offset: .2em; text-decorati
   <div class="wrap reveal">
     <img class="close__icon" src="assets/icon-256.png" width="256" height="256" loading="lazy" decoding="async" alt="">
     <h2 id="close-title">Plan tonight. <span>Leave your phone in the pack.</span></h2>
-    <p class="soon"><span class="soon__dot" aria-hidden="true"></span>Coming to the App Store</p>
-<!-- STAGED: App Store link (closing section). On approval: as in the hero.
-    <a class="get" href="https://apps.apple.com/app/idAPPLE_ID">Download on the App Store</a>
--->
-    <p class="close__fine">For iPhone with iOS 26 or later, and Apple Watch with watchOS 26 or later.</p>
+    <a class="get" href="https://apps.apple.com/app/id6831210304">Download on the App Store</a>
+    <p class="close__fine">For iPhone with iOS 26, iPad with iPadOS 26 and Apple Watch with watchOS 26, or later.</p>
   </div>
   <div class="ridge reveal" aria-hidden="true">
 <!-- profile: art/route-profile.svg from tools/art (the illustrative route's elevation). -->
