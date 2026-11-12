@@ -1,0 +1,12 @@
+# Gitleaks config for the guard workflow: keep every default rule and
+# exempt only the Cloudflare Web Analytics beacon. Its token is public
+# by design (it ships in every page's HTML), so it is not a secret.
+title = "gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Cloudflare Web Analytics beacon token (public by design)"
+regexTarget = "line"
+regexes = ['''data-cf-beacon=''']
